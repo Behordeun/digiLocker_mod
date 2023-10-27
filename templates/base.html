@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link href="{{ url_for('static', filename='/css/styles.css') }}" rel="stylesheet">
+	{% block title %}
+	{% endblock title %}
+	{% block style %}
+	{% endblock style %}
+</head>
+
+<body>
+	<div id="main_useraddress" uaddress="{{user_address}}"></div>
+	<div id="main-loader">
+		<div class="loader">
+			<div class="hex"></div>
+			<div class="para1"></div>
+			<div class="para2"></div>
+			<div class="para3"></div>
+		</div>
+	</div>
+
+
+
+
+	{% block container %}
+
+	{% endblock container %}
+
+	{% include "components/footer.html" %}
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7/web3.min.js">
+	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+	<script type="text/javascript" src="{{ url_for('static', filename='js/abi.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/base.js') }}"></script>
+
+	<script>
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+		{% for message in messages %}
+		swal({
+            title: "Warning!",
+            text: "{{ message }}",
+            icon: "warning",
+            allowOutsideClick: false,
+            closeOnClickOutside: false,
+        });
+		{% endfor %}
+	{% endif %}
+	{% endwith %}
+	{% block body %}{% endblock %}
+	</script>
+
+
+	{% block javascript %}
+	{% endblock javascript %}
+</body>
+</html>

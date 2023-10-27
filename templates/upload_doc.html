@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block container %}
+{% include "components/navbar.html" %}
+
+
+<main id="main_id" user_address="{{user_address}}">
+    <div class="container">
+        <div class="row">
+            <form id="id_upload_doc" method="post" enctype="multipart/form-data" address="{{user_address}}">
+
+                <input id="total_doc" type="text" class="validate" hidden name="total_doc">
+
+
+                <div class="row">
+                    <div class="file-field input-field">
+                        <div class="btn">
+                            <span>File</span>
+                            
+                            <input type="file" required id="file" name="file">
+                            <i class="material-icons right">insert_drive_file</i>
+
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input type="text" class="file-path validate">
+                            <span class="helper-text">Max Upload size = 5MB</span>
+                            <span class="helper-text">Allowed file extensions = ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', "docx"]</span>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="input-field col s12">
+                    <i class="material-icons prefix">vpn_key</i>
+                        <input id="master_key" type="password" class="validate" name="master_key" required>
+                        <label for="master_key">Master Key</label>
+                        <span class="helper-text">Enter your master key</span>
+
+                    </div>
+                </div>
+
+                <button class="btn waves-effect waves-light btn-large center-align" type="submit" name="action">
+                Upload<i class="material-icons right">cloud_upload</i>
+                </button>
+            </form>
+
+        </div>
+    </div>
+</main>
+
+{% endblock container %}
+
+{% block javascript %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9/sha256.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/upload_doc.js') }}"></script>
+{% endblock javascript %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block style %}
+{% endblock style %}
+
+{% block container %}
+{% include "components/navbar.html" %}
+
+
+
+<main id="main_id" user_address="{{user_address}}" style = "display:none;">
+	
+	<!-- This dashboard is displayed to Resident -->
+	<div class="container" id="residentDashboard">
+		<div class="row header">
+			<div class="float-left">
+				<p>User Name :  <strong id="usr_name"></strong></p>
+				<p>Logged-in Email Address : <strong id="email_addr"></strong></p>
+				<p>Total docs uploaded : <strong id="total_docs"></strong></p>
+				<p>You have total fund of: <strong class="funds"></strong> ETH</p>
+			</div>
+			<div class="float-right upload_btn">
+				<a href="/dashboard/upload/doc" class="waves-effect waves-light btn">
+					<i class="material-icons tiny left">file_upload</i>
+					<span>Upload Document</span> 
+				</a>
+			</div>
+		</div>
+		<table id="document_table">
+			<thead>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+	<!-- ********************************************************** -->
+
+
+	<!-- This dashboard is displayed to Organization/requestor -->
+	<div class="container" id="requestorDashboard">
+		<div class="row header">
+			<div class="float-left">
+				<p>Organization Name :  <strong id="org_name"></strong></p>
+				<p>Organization Email Address : <strong id="org_addr"></strong></p>
+				<p>You have total fund of : <strong class="funds"></strong> ETH</p>
+			</div>
+			<div class="float-right upload_btn">
+				<a class="waves-effect waves-light btn modal-trigger" href="#requestDoc">
+					Search Document
+					<i class="material-icons right">search</i>
+				</a>
+			</div>
+		</div>
+
+		<div class="row">
+			<div id = "sharedDocumentListByUser">
+				<ul class="collapsible popout scale-transition">
+					
+
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- ********************************************************** -->
+
+</main>
+
+<div id="declarationModel" class="modal">
+    <div class="modal-content">
+        <h5 class="doc_name_modal" bold></h5>
+        <br>
+        <div class="container">
+            <form id="verifyThisDoc">
+                <div class="input-field">
+                    <p>The document <strong id="doc_name"></strong> contained in the digital locker submitted by <strong id="doc_owner"></strong> are accurate
+					   and up to date. We recognise that any inaccurate statement in this document may constitute fraud and be subject to
+					   the full penalty of the law.</p>
+                </div>
+                <br>
+                <div class="modal-footer">
+                    <button type="submit" class="btn float-right modal-close waves-effect waves-green btn-flat">Confirm Verification</br>
+                    </button>
+                </div>
+                <br>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% include "components/modal_searchdoc.html" %}
+{% include "components/modal_shareddoc.html" %}
+{% include "components/modal_sharethisdoc.html" %}
+
+
+{% endblock container %}
+
+{% block javascript %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+{% endblock javascript %}

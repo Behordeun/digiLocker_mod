@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block style %}
+{% endblock style %}
+{% block container %}
+{% include "components/navbar.html" %}
+
+<main>
+    <div class="container">
+        <div class="row">
+            <h5 class="bold">Document Information</h5><hr/>
+        </div>
+        <table id="document_table">
+            <thead>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <form class="col s12" id="requestorDecryption" address="{{user_address}}"
+                requester_address={{requester_address}} owner_address={{owner_address}} doc_id={{doc_id}} ekey={{ekey}}>
+
+                <div class="row">
+                    <h5 class="bold">Download the document</h5><hr/>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <i class="material-icons prefix">vpn_key</i>
+                        <textarea id="private_key" type="password" class="validate materialize-textarea" required=""
+                            aria-required="true"></textarea>
+                        <label for="private_key">Enter your private key</label>
+                        <span class="helper-text">Enter your private key to download the document.
+                            Admin has sent you the private key during registration.</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <center>
+                        <button class="btn waves-effect waves-light btn-large" type="submit">Download
+                        </button>
+                    </center>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock container %}
+{% block javascript %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/download.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/requester_decryption.js') }}"></script>
+{% endblock javascript %}
