@@ -9,7 +9,7 @@ chardet==3.0.4
 click==7.1.1
 cryptography==2.8
 cytoolz==0.10.1
-dapr
+#dapr
 dapr.ext.grpc
 dapr-client
 datetime
