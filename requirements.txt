@@ -49,7 +49,7 @@ PyJWT==1.7.1
 pyrsistent==0.16.0
 python-dotenv==1.0.0
 # pywin32==227
-requests==2.23.0
+requests==2.31.0
 requests-oauthlib==1.3.0
 rlp==1.2.0
 six==1.14.0
