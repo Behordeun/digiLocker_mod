@@ -22,7 +22,7 @@ eth-keys==0.2.4
 eth-rlp==0.1.2
 eth-typing==2.2.1
 eth-utils==1.8.4
-Flask==1.1.1
+Flask==2.2.5
 Flask-Dance==3.0.0
 Flask-Dapr==1.11.0
 Flask-Mail==0.9.1
