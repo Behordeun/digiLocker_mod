@@ -47,7 +47,7 @@ actor_runtime_config = ActorRuntimeConfig(
     reminders_storage_partitions=7
 )
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', "docx"])
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', "docx", ".py"])
 
 app.config.from_object(settings)
 mail = Mail(app)
