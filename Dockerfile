@@ -49,9 +49,9 @@ COPY . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install dapr
-RUN pip install dapr.ext.grpc
-RUN pip install dapr-client
+RUN pip install --no-cache-dir dapr
+RUN pip install --no-cache-dir dapr.ext.grpc
+RUN pip install --no-cache-dir dapr-client
 
 # Expose the ports your app runs on
 EXPOSE $DAPR_APP_PORT
