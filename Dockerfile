@@ -55,8 +55,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE $DAPR_APP_PORT
 
 # Run app.py when the container launches
-#CMD ["gunicorn", "-w 2", "-b", "0.0.0.0:8083", "-t 120", "main:app"]
+CMD ["gunicorn", "-w 2", "-b", "0.0.0.0:8083", "-t 120", "main:app"]
 
 # Start Dapr sidecar and then your Flask app
-CMD ["dapr", "run", "--app-id", "digiLocker", "--app-port", "8083", "--log-level", "error", "python", "main.py"]
+#CMD ["dapr", "run", "--app-id", "digiLocker", "--app-port", "8083", "--log-level", "error", "python", "main.py"]
 #CMD ["dapr", "run", "--app-id", "digiLocker", "--app-port", "8083", "python", "main.py"]
