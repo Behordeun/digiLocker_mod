@@ -45,7 +45,7 @@ WORKDIR /app
 COPY . /app
 
 RUN cp .env.example .env
-RUN mv .dapr/ /local/
+RUN mv .dapr/ /root/
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --upgrade pip
