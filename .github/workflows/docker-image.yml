@@ -19,7 +19,7 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: digiLocker #${{ github.repository }}
+  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/digiLocker #${{ github.repository }}
 
 
 jobs:
