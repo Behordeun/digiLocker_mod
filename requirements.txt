@@ -43,7 +43,7 @@ multiaddr==0.0.9
 netaddr==0.7.19
 oauthlib==3.1.0
 parsimonious==0.8.1
-protobuf==3.13.0
+protobuf==3.18.3
 pycparser==2.20
 pycryptodomex
 pycryptodome==3.9.7
