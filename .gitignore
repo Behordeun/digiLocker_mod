@@ -141,4 +141,3 @@ logs/*
 ben/
 config.py
 screenshots/
-.env.example

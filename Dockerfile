@@ -1,5 +1,5 @@
 # Use the official Python base image
-FROM python:3.9-slim
+FROM python:3.9.18
 
 # Set the arguments
 ARG APP_SECRETKEY
@@ -44,18 +44,19 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
+RUN cp .env.example .env
+RUN mv .dapr/ /local/
+
 # Install any needed packages specified in requirements.txt
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir dapr
-RUN pip install --no-cache-dir dapr.ext.grpc
-RUN pip install --no-cache-dir dapr-client
 
 # Expose the ports your app runs on
 EXPOSE $DAPR_APP_PORT
 
 # Run app.py when the container launches
-#CMD ["gunicorn", "-w 2", "-b", "0.0.0.0:8000", "-t 120", "main:app"]
+#CMD ["gunicorn", "-w 2", "-b", "0.0.0.0:8083", "-t 120", "main:app"]
 
 # Start Dapr sidecar and then your Flask app
-CMD ["dapr", "run", "--app-id", "digiLocker", "--app-port", "8083", "python", "main.py"]
+CMD ["dapr", "run", "--app-id", "digiLocker", "--app-port", "8083", "--log-level", "error", "python", "main.py"]
+#CMD ["dapr", "run", "--app-id", "digiLocker", "--app-port", "8083", "python", "main.py"]
