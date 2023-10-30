@@ -1,5 +1,7 @@
 # Digital locker using Ethereum Blockchain
 
+[![Docker Image CI](https://github.com/Behordeun/digiLocker_mod/actions/workflows/docker-image.yml/badge.svg)](https://github.com/Behordeun/digiLocker_mod/actions/workflows/docker-image.yml)
+
 ## Research Paper
 
 View the paper [here](https://drive.google.com/file/d/1VXvfNA6ipPr8VxRAEaJLFGmXbmeHWk86/view?usp=sharing)
