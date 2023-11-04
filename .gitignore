@@ -141,3 +141,6 @@ logs/*
 ben/
 config.py
 screenshots/
+mongo-data/
+.dapr/
+.vscode/

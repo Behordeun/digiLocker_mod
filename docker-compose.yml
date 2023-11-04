@@ -3,16 +3,26 @@ services:
   flask-app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-dev
     ports:
       - "8083:8083"
     environment:
       - FLASK_APP=main.py
       - FLASK_RUN_HOST=0.0.0.0
+      - MONGODB_URI=mongodb://mongodb:27017/  # MongoDB connection URI
+      - MONGODB_DB=digilocker  # Replace with your MongoDB database name
     volumes:
       - ./main.py:/app/main.py
     depends_on:
       - redis
+      - mongodb  # Add dependency on MongoDB service
 
   redis:
     image: "redis:alpine"
+
+  mongodb:
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"  # Map MongoDB port to the host
+    volumes:
+      - ./mongo-data:/data/db  # Persist MongoDB data
