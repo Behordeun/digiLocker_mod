@@ -39,7 +39,7 @@ ENV DAPR_APP_PORT=8083
 #RUN wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
 
 # Install MongoDB
-RUN apt-get update && apt-get install -y mongodb
+#RUN apt-get update && apt-get install -y mongodb
 
 # Create a directory for your app and set it as the working directory
 WORKDIR /app
