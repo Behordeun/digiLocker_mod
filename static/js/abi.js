@@ -1,4 +1,4 @@
-var contractAddress = "0x6150C0D006Fb80a259257D0d4726735085b3667E";
+var contractAddress = "0xE1df32e5933C23bE9B765E371eFAAFFa37f82730";
 
 var abi = [
   {
@@ -108,7 +108,6 @@ var abi = [
     type: "event",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "bytes32",
@@ -124,12 +123,10 @@ var abi = [
         type: "bool",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "string",
@@ -145,12 +142,10 @@ var abi = [
         type: "address",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
     name: "getDocCountByUserId",
     outputs: [
@@ -160,12 +155,10 @@ var abi = [
         type: "uint256",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "bytes32",
@@ -186,12 +179,10 @@ var abi = [
         type: "uint256",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "bytes32",
@@ -242,12 +233,10 @@ var abi = [
         type: "string",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "bytes32",
@@ -268,12 +257,10 @@ var abi = [
         type: "string",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "address",
@@ -299,12 +286,10 @@ var abi = [
         type: "bytes32[]",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
     name: "getEmailIdByAddrss",
     outputs: [
@@ -324,12 +309,10 @@ var abi = [
         type: "string",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "address",
@@ -355,12 +338,10 @@ var abi = [
         type: "string",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "bytes32",
@@ -381,12 +362,10 @@ var abi = [
         type: "string",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
     name: "getOwnerDocumetList",
     outputs: [
@@ -406,12 +385,10 @@ var abi = [
         type: "bytes32[]",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "address",
@@ -427,12 +404,10 @@ var abi = [
         type: "string",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
     name: "getRegisteredUser",
     outputs: [
@@ -452,12 +427,10 @@ var abi = [
         type: "string",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
     name: "getUserType",
     outputs: [
@@ -467,12 +440,10 @@ var abi = [
         type: "uint8",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
     name: "getUseraccessKey",
     outputs: [
@@ -482,12 +453,10 @@ var abi = [
         type: "bytes32",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: "string",
@@ -503,12 +472,10 @@ var abi = [
         type: "bool",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
     inputs: [],
     name: "isalreadyRegisteredUser",
     outputs: [
@@ -518,12 +485,10 @@ var abi = [
         type: "bool",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: "string",
@@ -569,12 +534,10 @@ var abi = [
         type: "bool",
       },
     ],
-    payable: false,
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: "bytes32",
@@ -594,12 +557,10 @@ var abi = [
     ],
     name: "shareDocumentwithUser",
     outputs: [],
-    payable: false,
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: "string",
@@ -630,12 +591,10 @@ var abi = [
         type: "bool",
       },
     ],
-    payable: false,
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    constant: false,
     inputs: [
       {
         internalType: "bytes32",
@@ -650,7 +609,6 @@ var abi = [
     ],
     name: "verifyUserDocument",
     outputs: [],
-    payable: false,
     stateMutability: "nonpayable",
     type: "function",
   },
