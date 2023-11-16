@@ -26,7 +26,7 @@ tests/.coverage
 build/
 tests/report/
 tcl/
-Scripts/
+# Scripts/
 get-pip.py
 include/
 temp/
