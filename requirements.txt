@@ -55,6 +55,7 @@ python-dotenv==1.0.0
 requests==2.23.0
 requests-oauthlib==1.3.0
 rlp==1.2.0
+sendgrid
 six==1.14.0
 toolz==0.10.0
 typing-extensions==3.7.4.1

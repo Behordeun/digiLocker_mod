@@ -24,6 +24,7 @@ import dropbox
 import jwt
 import settings
 from flask_mail import Mail
+from flask_mail import Message
 from utils import *
 
 #app = Flask(__name__)
@@ -226,8 +227,12 @@ def registration_postapi(user_address):
             mkey_digest.update(app.config["SECRET_KEY"])
             mkey_digest = mkey_digest.hexdigest()
 
-            msg = prepareMailMsg(f"{first_name} {last_name}", email, user_address, None, MAIL_SENDER)
-            mail.send(msg)  
+            msg = Message(
+                recipients = email, 
+                sender = MAIL_SENDER
+                )
+            msg.body = f"{first_name} {last_name}"
+            mail.send(msg)
 
             return {
                 'success': True, 
@@ -240,7 +245,7 @@ def registration_postapi(user_address):
         elif utype == "2":
             pu, pr = generateRSAKeypair()
             pu = binascii.hexlify(pu.encode()).decode()
-            msg = prepareMailMsg(f"{first_name}", email, user_address, pr, MAIL_SENDER)
+            msg = Message(f"{first_name}", email, user_address, pr, MAIL_SENDER)
             mail.send(msg)  
             return jsonify({
                 'success': True, 

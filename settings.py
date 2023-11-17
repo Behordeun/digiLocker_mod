@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.getenv('SECRET_KEY', None)
+SECRET_KEY = b"Admin__1234" #os.getenv('SECRET_KEY', None)
 MAX_CONTENT_LENGTH = 5 * 1024 * 1024 # 5MB
 
 DROPBOX_KEY = os.getenv('DROPBOX_KEY', None)
@@ -30,3 +30,5 @@ SERVER_BASE_ADDRESS = os.getenv('SERVER_BASE_ADDRESS', None)
 VERIFICATION_CODES = os.getenv("VERIFICATION_CODES", None)
 APPLICATION_HOST = os.getenv("APPLICATION_HOST", None)
 APPLICATION_PORT = os.getenv("APPLICATION_PORT", None)
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", None)
+MAILTRAP_API_KEY = os.getenv("MAILTRAP_API_KEY", None)
