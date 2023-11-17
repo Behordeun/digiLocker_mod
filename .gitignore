@@ -156,3 +156,7 @@ node_modules
 /coverage
 /coverage.json
 /.env
+main_two.py
+.devcontainer/
+GDrive/
+environment.yml

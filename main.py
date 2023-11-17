@@ -228,10 +228,20 @@ def registration_postapi(user_address):
             mkey_digest = mkey_digest.hexdigest()
 
             msg = Message(
-                recipients = email, 
+                recipients = [email,], 
                 sender = MAIL_SENDER
                 )
-            msg.body = f"{first_name} {last_name}"
+            msg.body = f"""
+                    Hello, {first_name} {last_name}, 
+                    
+                    Welcome to digiLocker. You are now authorized to use digiLocker to store your documents.
+
+                    Now, you are in full control of how your documents are shared with users.
+
+                    Regards,
+                    Muhammad A.
+                    For the digiLocker Team
+                """
             mail.send(msg)
 
             return {
@@ -245,7 +255,22 @@ def registration_postapi(user_address):
         elif utype == "2":
             pu, pr = generateRSAKeypair()
             pu = binascii.hexlify(pu.encode()).decode()
-            msg = Message(f"{first_name}", email, user_address, pr, MAIL_SENDER)
+            org_name = request.form.get("org_name")
+            msg = Message( 
+                recipients= [email,], 
+                sender = MAIL_SENDER)
+            msg.body = f"""
+            Hello {org_name}, welcome to digiLocker.
+
+            Now, your organization can access and verify documents shared by residents. We hope that you'll keep their data protected in line with the appropriate global DPRs.
+
+            Below are your credentials:
+            * {pu} 
+            * {pr}
+            Regards,
+            Muhammad A.
+            For the digiLocker Team
+            """
             mail.send(msg)  
             return jsonify({
                 'success': True, 
@@ -392,16 +417,12 @@ def sendRequestMailToResident(user_address):
         owner_name = request.form.get("owner_name")
         
         approval_url = f"{SERVER_BASE_ADDRESS}/resident/aproove/doc/?requester={requester_address}&owner={owner_address}&doc_id={doc_id}"
-        msg = prepareRequestMail(
-            owner_name, 
-            owner_email, 
-            requester_email, 
-            doc_name, 
-            approval_url,
-            owner_address,
-            requester_address,
-            MAIL_SENDER
+        msg = Message(
+            recipients = [owner_email,], 
+            sender = MAIL_SENDER
         )
+        msg.body = f"""
+            Hello {owner_name}, {requester_email} is requesting access to {doc_name} please review the request and accept/decline the request via {approval_url}"""
         mail.send(msg)
         return jsonify({'success': True, 'redirect_url': "/dashboard", "status_code": 200})
     except Exception as e:
@@ -442,16 +463,17 @@ def sendAproovedMailToRequestor(user_address):
         access_url +=  f"?requester={requester_address}&owner={owner_address}"
         access_url += f"&doc_id={doc_id}&ekey={encrypted_mkey}"
 
-        msg = prepareAproovedMail(
-            owner_name, 
-            owner_email, 
-            requester_email, 
-            doc_name, 
-            access_url,
-            owner_address,
-            requester_address,
-            MAIL_SENDER
+        msg = Message(
+            recipients = [requester_email,],
+            sender = MAIL_SENDER
         )
+        msg.body = f"""
+            Hello, {owner_name} has approved your request to access {doc_name}, you can now view the document via {access_url}.
+
+            Regards,
+            Muhammad A.
+            For the digiLocker Team
+        """
         mail.send(msg)
         return jsonify({'success': True, "status_code": 200})
     except Exception as e:
