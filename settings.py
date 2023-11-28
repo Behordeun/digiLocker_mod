@@ -12,7 +12,7 @@ SECRET_KEY = b"Admin__1234" #os.getenv('SECRET_KEY', None)
 MAX_CONTENT_LENGTH = 5 * 1024 * 1024 # 5MB
 
 DROPBOX_KEY = os.getenv('DROPBOX_KEY', None)
-DROPBOX_SECRET = os.getenv('DROPBOX_SECRET', None) 
+DROPBOX_SECRET = os.getenv('DROPBOX_SECRET', None)
 DROPBOX_ACCESS_TYPE = os.getenv('DROPBOX_ACCESS_TYPE', "files.content.write")
 SCOPE = os.getenv("SCOPE")
 DROPBOX_ACCESS_TOKEN = os.getenv('DROPBOX_ACCESS_TOKEN', None)
@@ -22,7 +22,7 @@ MAIL_PORT = 465
 MAIL_USERNAME = os.getenv('MAIL_USERNAME', None)
 MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', None)
 MAIL_USE_TLS = False
-MAIL_USE_SSL = True 
+MAIL_USE_SSL = True
 MAIL_ASCII_ATTACHMENTS = True
 MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', None)
 MAIL_SENDER = os.getenv('MAIL_SENDER', None)
