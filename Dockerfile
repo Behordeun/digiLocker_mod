@@ -47,8 +47,8 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-RUN cp .env.example .env
-RUN mv .dapr/ /root/
+#RUN cp .env.example .env
+#RUN mv .dapr/ /root/
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --upgrade pip
