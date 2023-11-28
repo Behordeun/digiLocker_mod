@@ -49,21 +49,17 @@ ENV DAPR_APP_PORT=8083
 WORKDIR /app/
 
 # Copy the current directory contents into the container at /app
+COPY .env /app/
 COPY . /app/
 
-RUN useradd python
-USER python
-
-COPY --chown=python:python .env /app/
-
-#RUN cp  .env
+#RUN cp  .env.example .env
 #RUN mv .dapr/ /root/
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Expose the ports your app runs on
-EXPOSE 8083
+EXPOSE $DAPR_APP_PORT
 
 # Run main.py when the container launches
 #CMD ["python", "main.py"]
