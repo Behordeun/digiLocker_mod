@@ -4,13 +4,11 @@ base58==2.0.0
 #blinker==1.4
 cachetools
 certifi==2019.11.28
-cffi
-#==1.14.0
+cffi==1.14.0
 chardet==3.0.4
 #click==7.1.1
 cryptography==2.8
-cytoolz
-#==0.10.1
+cytoolz==0.10.1
 dapr==1.2.0
 dapr-client==0.4.0b1
 dapr.ext.grpc==1.2.0
@@ -42,8 +40,7 @@ ipfshttpclient==0.4.12
 jsonify==0.5
 jsonschema==3.2.0
 kafka-python
-lru-dict
-#==1.1.6
+lru-dict#==1.1.6
 #MarkupSafe==1.1.1
 multiaddr==0.0.9
 netaddr==0.7.19
