@@ -160,3 +160,5 @@ main_two.py
 .devcontainer/
 GDrive/
 environment.yml
+.history/
+.vscode/
