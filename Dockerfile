@@ -46,23 +46,28 @@ ENV DAPR_APP_PORT=8083
 #RUN apt-get update && apt-get install -y mongodb
 
 # Create a directory for your app and set it as the working directory
-WORKDIR /app
+WORKDIR /app/
 
 # Copy the current directory contents into the container at /app
-COPY . /app
+COPY . /app/
+
+RUN useradd python
+USER python
+
+COPY --chown=python:python .env /app/
 
 #RUN cp  .env
 #RUN mv .dapr/ /root/
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Expose the ports your app runs on
-EXPOSE $DAPR_APP_PORT
+EXPOSE 8083
 
 # Run main.py when the container launches
 #CMD ["python", "main.py"]
+
 CMD ["gunicorn", "-w 2", "-b", "0.0.0.0:8083", "-t 120", "main:app"]
 
 # Start Dapr sidecar and then your Flask app
