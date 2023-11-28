@@ -74,11 +74,11 @@ def prepareMailMsg(name, from_mail, address, pr, MAIL_SENDER):
     return msg
 
 
-def prepareRequestMail(        
-        owner_name, 
-        owner_email, 
-        requester_email, 
-        doc_name, 
+def prepareRequestMail(
+        owner_name,
+        owner_email,
+        requester_email,
+        doc_name,
         approval_url,
         owner_address,
         requester_address,
@@ -91,10 +91,10 @@ def prepareRequestMail(
         </head>
         <body>
         <p> Hello {owner_name}, <br /> <br />
-        The request has been raised by email : {requester_email} 
-            ({requester_address}) for your document <strong>{doc_name}</strong>. 
+        The request has been raised by email : {requester_email}
+            ({requester_address}) for your document <strong>{doc_name}</strong>.
         <br /><br />
-        Please click on below button to permit the read access of the owned 
+        Please click on below button to permit the read access of the owned
         document.
         <br/>
         <br/>
@@ -127,12 +127,12 @@ def prepareRequestMail(
     msg.html = msgHtml
     msg.subject = f"Read access Request for document: {doc_name} by {requester_email}"
     return msg
-    
-def prepareAproovedMail(        
-        owner_name, 
-        owner_email, 
-        requester_email, 
-        doc_name, 
+
+def prepareApro0vedMail(
+        owner_name,
+        owner_email,
+        requester_email,
+        doc_name,
         approval_url,
         owner_address,
         requester_address,
@@ -171,7 +171,7 @@ def prepareAproovedMail(
 
         <p>
         On clicking the above link, you will be asked for your private Key
-         to download the document.
+        to download the document.
         </p>
         <br>
 
@@ -186,4 +186,3 @@ def prepareAproovedMail(
     msg.html = msgHtml
     msg.subject = f"{owner_name} shared document with you"
     return msg
-    
