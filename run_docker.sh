@@ -9,4 +9,4 @@ docker build -t digilocker_mod:dev-2 .
 docker images
 
 # Step 3:
-docker run -p 8083:8083 igilocker_mod:dev-2
+docker run -p 8083:8083 digilocker_mod:dev-2
