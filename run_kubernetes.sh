@@ -8,7 +8,7 @@ dockerpath=herbehordeun/digilocker-mod
 
 kubectl run digilocker-mod\
     --image=$dockerpath\
-    --port=80 --labels app=digilocker-mod
+    --port=8083 --labels app=digilocker-mod
 
 
 # List kubernetes pods
