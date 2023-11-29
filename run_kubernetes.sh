@@ -15,4 +15,4 @@ kubectl run digilocker-mod\
 kubectl get pods
 
 # Forward the container port to a host
-kubectl port-forward digilocker-mod 8000:80
+kubectl port-forward digilocker-mod 8083:8083
