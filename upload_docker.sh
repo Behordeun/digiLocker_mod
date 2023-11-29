@@ -5,12 +5,12 @@
 
 # Step 1:
 # Create dockerpath
-dockerpath=herbehordeun/digilocker_mod
+dockerpath=herbehordeun/digilocker-mod
 
 # Step 2:  
 # Authenticate & tag
 docker login --username=herbehordeun
-docker image tag digilocker_mod $dockerpath
+docker image tag digilocker-mod $dockerpath
 echo "Docker ID and Image: $dockerpath"
 
 # Step 3:
