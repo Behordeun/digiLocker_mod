@@ -144,3 +144,4 @@ screenshots/
 mongo-data/
 .dapr/
 .vscode/
+config.py
