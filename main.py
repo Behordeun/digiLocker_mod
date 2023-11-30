@@ -1,8 +1,6 @@
 import binascii
 import datetime
 import hashlib
-import os
-from dotenv import load_dotenv
 import random
 import string
 from base64 import b64decode, b64encode
@@ -30,8 +28,6 @@ from utils import *
 #app = Flask(__name__)
 
 app = Flask(f"{DemoActor.__name__}Service")
-
-load_dotenv()
 
 # Enable DaprActor Extension
 actor = DaprActor(app)
