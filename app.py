@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from base64 import b64decode, b64encode
 from functools import wraps
 
+from datetime import timedelta
+
 # from dapr.actor import ActorInterface, actormethod
 from dapr.actor.runtime.config import (
     ActorRuntimeConfig,
@@ -17,7 +19,6 @@ from flask_dapr.actor import DaprActor
 
 # from dapr.conf import settings
 from dapr_config.demo_actor import DemoActor
-from datetime import timedelta
 
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.PublicKey import RSA
@@ -46,28 +47,14 @@ load_dotenv()
 # app = Flask(__name__)
 
 app = Flask(f"{DemoActor.__name__}Service")
+app.config.from_object(settings)
 
-# Enable DaprActor Extension
-actor = DaprActor(app)
-
-# Register DemoActor
-actor.register_actor(DemoActor)
-
-# Create ActorRuntime configuration
-# actor_runtime_config = ActorRuntimeConfig(
-#    actor_idle_timeout=timedelta(hours=1),
-#    actor_scan_interval=timedelta(seconds=30),
-#    drain_ongoing_call_timeout=timedelta(minutes=1),
-#    drain_rebalanced_actors=True,
-#    reentrancy=ActorReentrancyConfig(enabled=False),
-#    reminders_storage_partitions=7
-# )
 
 ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".py"])
 # os.getenv.from_object(settings)
 mail = Mail(app)
-dropbox_ = dropbox.Dropbox(os.getenv("DROPBOX_ACCESS_TOKEN"))
-SERVER_BASE_ADDRESS = os.getenv("SERVER_BASE_ADDRESS")
+dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
+SERVER_BASE_ADDRESS = app.config["SERVER_BASE_ADDRESS"]
 
 
 def token_required(f):
@@ -76,7 +63,7 @@ def token_required(f):
         if "x-access-tokens" in session.keys():
             token = session.get("x-access-tokens")
             try:
-                data = jwt.decode(token, os.getenv("SECRET_KEY"))
+                data = jwt.decode(token, app.config["SECRET_KEY"])
                 user_address = session.get("user_address")
                 return f(user_address, *args, **kwargs)
             except AttributeError as e:
@@ -200,7 +187,7 @@ def comparehash_digest_nd_senddockey(user_address):
 
         mkey_digest_new = hashlib.sha256()
         mkey_digest_new.update(master_key.strip().encode())
-        mkey_digest_new.update(os.getenv("SECRET_KEY"))
+        mkey_digest_new.update(app.config["SECRET_KEY"])
         # mkey_digest_new.update(user_address.encode())
         mkey_digest_new = mkey_digest_new.hexdigest()
 
@@ -233,7 +220,7 @@ def registration_postapi(user_address):
         email = request.form.get("email")
         first_name = request.form.get("first_name")
         utype = request.form.get("utype")
-        MAIL_SENDER = os.getenv("MAIL_SENDER")
+        MAIL_SENDER = app.config["MAIL_SENDER"]
 
         if utype == "1":
             master_key = request.form.get("master_key")
@@ -241,21 +228,21 @@ def registration_postapi(user_address):
             # TODO: ADD MORE PARAMS IN HASH
             mkey_digest = hashlib.sha256()
             mkey_digest.update(master_key.strip().encode())
-            mkey_digest.update(os.getenv("SECRET_KEY"))
+            mkey_digest.update(app.config["SECRET_KEY"])
             mkey_digest = mkey_digest.hexdigest()
 
             msg = Message(
                 recipients=[
                     email,
                 ],
+                subject = f"Hello, {first_name} {last_name}",
                 sender=MAIL_SENDER,
             )
             msg.body = f"""
-                    Hello, {first_name} {last_name},
 
                     Welcome to digiLocker. You are now authorized to use digiLocker to store your documents.
                     
-                    Your master key is {master_key}, please keep this email safe as we do not record this information, and are unable to recover it for you.
+                    Your master key is \033[1m{master_key}\033[0m", please keep this email safe as we do not record this information, and are unable to recover it for you.
 
                     Now, you are in full control of how your documents are shared with users.
 
@@ -281,12 +268,11 @@ def registration_postapi(user_address):
                 recipients=[
                     email,
                 ],
+                subject = f"Hello {org_name}",
                 sender=MAIL_SENDER,
             )
             msg.body = f"""
-            Hello {org_name}, welcome to digiLocker.
-
-            Now, your organization can access and verify documents shared by residents. We hope that you'll keep their data protected in line with the appropriate global DPRs.
+            welcome to digiLocker. Now, your organization can access and verify documents shared by residents. We hope that you'll keep their data protected in line with the appropriate global DPRs.
 
             Below are your credentials:
             * {pu}
@@ -325,7 +311,7 @@ def login_api():
             "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=120),
             "token": urandomToken,
         },
-        os.getenv("SECRET_KEY"),
+        app.config["SECRET_KEY"],
     ).decode("utf-8")
     session["x-access-tokens"] = token
     return jsonify(
@@ -367,7 +353,7 @@ def login_postapi():
 @token_required
 def verifyMasterCode(user_address):
     try:
-        if request.args.get("master_code", None) in os.getenv("VERIFICATION_CODES"):
+        if request.args.get("master_code", None) in app.config["VERIFICATION_CODES"]:
             return {"success": True, "valid": True, "status_code": 200}
         else:
             return {"success": True, "valid": False, "status_code": 200}
@@ -438,7 +424,7 @@ def sendRequestMailToResident(user_address):
     if not user_address:
         return jsonify({"success": False, "status_code": 401})
     try:
-        MAIL_SENDER = os.getenv("MAIL_SENDER")
+        MAIL_SENDER = app.config["MAIL_SENDER"]
         doc_id = request.form.get("doc_id")
         requester_email = request.form.get("requester_email")
         doc_name = request.form.get("doc_name")
@@ -452,6 +438,7 @@ def sendRequestMailToResident(user_address):
             recipients=[
                 owner_email,
             ],
+            subject = "\033[1mDocument Request\033[0m",
             sender=MAIL_SENDER,
         )
         msg.body = f"""
@@ -470,7 +457,7 @@ def sendAproovedMailToRequestor(user_address):
     if not user_address:
         return jsonify({"success": False, "status_code": 401})
     try:
-        MAIL_SENDER = os.getenv("MAIL_SENDER")
+        MAIL_SENDER = app.config["MAIL_SENDER"]
 
         doc_id = request.form.get("doc_id")
         doc_name = request.form.get("doc_name")
@@ -499,6 +486,7 @@ def sendAproovedMailToRequestor(user_address):
             recipients=[
                 requester_email,
             ],
+            subject = "\033[1mRequest Approved\033[0m",
             sender=MAIL_SENDER,
         )
         msg.body = f"""
