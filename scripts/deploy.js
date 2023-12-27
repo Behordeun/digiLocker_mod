@@ -24,7 +24,7 @@ async function main() {
     "./config.js",
     `
     export const contractAddress = "${contractAddress}"
-   export const ownerAddress = "${ownerAddress}"
+    export const ownerAddress = "${ownerAddress}"
 `
   );
 }
