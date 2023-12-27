@@ -1,0 +1,14 @@
+version: '3'
+services:
+  digiLocker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "${DAPR_APP_PORT}:${DAPR_APP_PORT}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
