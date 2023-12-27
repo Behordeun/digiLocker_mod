@@ -1,40 +1,15 @@
-# Digital locker using Ethereum Blockchain
 
-## Research Paper
+# Digital Locker using Ethereum Blockchain
 
-View the paper [here](https://drive.google.com/file/d/1VXvfNA6ipPr8VxRAEaJLFGmXbmeHWk86/view?usp=sharing)
+## Disclaimer
 
-Cite it
-```
-@INPROCEEDINGS{Sing2201:DD,
-AUTHOR="Jai Singhal and Ankit Gautam and Ashutosh Bhatia and Ankit Agrawal and
-Rekha Kaushik",
-TITLE="{DD-Locker:} Blockchain Based Decentralized Personal Document Locker",
-BOOKTITLE="2022 International Conference on Information Networking (ICOIN) (ICOIN
-2022)",
-ADDRESS="Jeju Island, Korea (South)",
-DAYS=11,
-MONTH=jan,
-YEAR=2022,
-KEYWORDS="Blockchain; Ethereum; Dapps; Smart Contract",
-ABSTRACT="Document verification is the first step whenever we enter any organization
-or institute. In any organization, it is essential to track, verify, and
-check the person's background who will become a part of the organization.
-This process
-is very time-consuming and hectic for both parties involved. Various
-governments provide cloud-based digital locker services for the citizens
-storing the public document on a centralized server. But due to its
-centralized nature, this type of service is weak against information
-breaches and Denial of Service (DoS) attacks. Also, there are some privacy
-concerns with such centralized digital locker services as the stored
-documents may contain users' crucial personal information. This paper
-proposes a blockchain-based digital locker in a decentralized application
-using Ethereum Blockchain to securely store personal documents with high
-availability. The proposed solution also verifies documents with ease,
-confidentiality, access control, data privacy, authenticity, and
-maintaining the integrity of documents."
-}
-```
+The original project belong to [Jai Singhal](https://www.linkedin.com/in/jai-singhal/) and the link to the original project is referenced [here](https://github.com/jai-singhal/digiLocker). I have only improved on the original project by making the following changes:
+
+1. Change the Test Network to Sepolia.
+2. Deployed the smart contract on **HardHat** wallet instead of the default **Truffle Wallet**.
+3. Introduced a new logic to auto-regenerate the __DropBox__ token if the supplied token had expired. This ensures a continous availability of the project and prevents breakage in the application functionality.
+4. Created a Dockerfile for building a docker image off the project for easy setup on different operating systems as well as integrating the application into other projects.
+5. Setup CI/CD for continuous deployment of the image upon every update made to the main branch.
 
 ## How to setup
 
@@ -44,27 +19,33 @@ Download the metamask extension from: https://metamask.io/
 
 ### Ethereum account and network
 
-We have used Rinkeby Test network, and deployed the contract on the same network. So to run the application, you may required to get some free ethers from [here](https://faucet.rinkeby.io/).
+We have used Sepolia Test network, and deployed the contract on the same network. So to run the application, you may required to get some free ethers from [here](https://sepoliafaucet.com/).
 
 ### Clone repository
 
 ```powershell
-git clone https://github.com/jai-singhal/digiLocker
+git clone https://github.com/Behordeun/digiLocker_mod.git
 
-# cd to digilocker
-cd digiLocker
+# cd to digilocker_mod
+cd digiLocker_mod
 ```
 
 ### create virtualenv
+
+The application works better on Python3.9. Hence, it's recommended that you have Python3.9 installed on your machine or you set it up using Docker
 
 ```powershell
 pip install virtualenv
 
 # create virtualenv in digilocker dir
-virtualenv .
+python3.9 -m virtualenv venv
 
 # activate the virtualenv
-./Scripts/activate
+## For Linux or MacOS
+source venv/bin/activate
+
+## For Windows OS
+source venv/Scripts/activate
 ```
 
 ### Install required packages
@@ -74,6 +55,7 @@ pip install -r requirements.txt
 ```
 
 ### Run the server
+
 ```powershell
 python main.py
 ```
@@ -83,7 +65,6 @@ python main.py
 ### Resident Perspective
 
 ![Resident](https://i.imgur.com/2Lrcsux.png)
-
 
 ### Requestor Perspective
 
@@ -97,11 +78,10 @@ python main.py
 
 ![doc](https://i.imgur.com/LeaB6zf.png)
 
-
-
 ## Configuration
 
 ### config.py
+
 Please add the `config.py` to your main directory with your credentials
 **Sample config.py**
 
@@ -111,17 +91,21 @@ APPCONFIG = {
     "APP_SECRETKEY":"",
     "DROPBOX_KEY":"",
     "DROPBOX_SECRET":"",
-    "DROPBOX_ACCESS_TYPE":"",
+    "DROPBOX_ACCESS_TYPE":"scopes",
     "DROPBOX_ACCESS_TOKEN":"",
     "MAIL_USERNAME":"",
     "MAIL_PASSWORD":"",
     "MAIL_DEFAULT_SENDER":"",
     "MAIL_SENDER":"",
     "SECRET_KEY": b"",
-    "SERVER_BASE_ADDRESS": "http://127.0.0.1:5000",
-    "VERIFICATION_CODES": [
-        "12345",
-        # your verification codes here.
-    ]
+    "SERVER_BASE_ADDRESS": "",
+    "VERIFICATION_CODES":[
+	"12345",
+	"other verification codes here"
+    ],
+    "APPLICATION_HOST":"0.0.0.0",
+    "APPLICATION_PORT":"",
+    "SEPOLIA_URL":"https://eth-sepolia.g.alchemy.com/v2/{your-sepolia-faucet-accound-id}",
+    "PRIVATE_KEY":"your-metamask-wallet-private-key"
 }
 ```
