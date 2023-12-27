@@ -1,7 +1,5 @@
 from app import app
-import os
 import settings
-from dotenv import load_dotenv
 # from dapr.actor import ActorInterface, actormethod
 from dapr.actor.runtime.config import (
     ActorRuntimeConfig,
@@ -30,8 +28,6 @@ actor.register_actor(DemoActor)
 #    reminders_storage_partitions=7
 # )
 
-
-load_dotenv()
 
 if __name__ == "__main__":
     app.run(
