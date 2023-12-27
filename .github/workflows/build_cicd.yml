@@ -12,12 +12,15 @@ on:
     branches:
       - main
       - dev-2
+      - digilocker_heroku
+
     # Publish semver tags as releases.
     tags: v*.*.*
   pull_request:
     branches:
       - main
       - dev-2
+      - digilocker_heroku
 
 env:
   # Use docker.io for Docker Hub if empty
