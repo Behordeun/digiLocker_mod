@@ -10,7 +10,7 @@ from .demo_actor_interface import DemoActorInterface
 
 class DemoActor(Actor, DemoActorInterface, Remindable):
     """Implements DemoActor actor service
-    
+
     This shows the usage of the below actor features:
 
     1. Actor method invocation
@@ -80,7 +80,7 @@ class DemoActor(Actor, DemoActorInterface, Remindable):
             # Unregister 'demo_timer'
             await self.unregister_timer('demo_timer')
         print(f'set_timer is done', flush=True)
-    
+
     async def timer_callback(self, state) -> None:
         """A callback which will be called whenever timer is triggered.
 
