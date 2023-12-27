@@ -67,7 +67,7 @@ contract digiLocker {
 
     function getRegisteredUser() public view returns(bytes32, address, string memory){
        return (
-           registerUsers[msg.sender].accessKey, 
+           registerUsers[msg.sender].accessKey,
            registerUsers[msg.sender]._useraddress,
            registerUsers[msg.sender].details.firstName
        );
