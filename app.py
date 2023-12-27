@@ -31,9 +31,7 @@ from utils import *
 
 load_dotenv()
 
-# app = Flask(__name__)
-
-app = Flask(f"{DemoActor.__name__}Service")
+app = Flask(__name__)
 app.config.from_object(settings)
 
 
