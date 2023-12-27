@@ -5,7 +5,7 @@
 # Step 1:
 docker build -t digilocker-mod:dev-2 .
 
-# Step 2: 
+# Step 2:
 docker images
 
 # Step 3:
