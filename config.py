@@ -10,7 +10,7 @@ APPCONFIG = {
     "MAIL_DEFAULT_SENDER":"digilockertestuser@gmail.com",
     "MAIL_SENDER":"DigiLocker Team",
     "SECRET_KEY": b"Admin__1234",
-    "SERVER_BASE_ADDRESS": "http://127.0.0.1:5000",
+    "SERVER_BASE_ADDRESS": "https://digilocker-b28772b1b39f.herokuapp.com",
     "VERIFICATION_CODES":[
 	"12345",
 	"A2341",
