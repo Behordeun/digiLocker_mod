@@ -3,22 +3,9 @@ import datetime
 import hashlib
 import random
 import string
-import os
 from dotenv import load_dotenv
 from base64 import b64decode, b64encode
 from functools import wraps
-
-from datetime import timedelta
-
-# from dapr.actor import ActorInterface, actormethod
-from dapr.actor.runtime.config import (
-    ActorRuntimeConfig,
-    ActorReentrancyConfig,
-)  # , ActorTypeConfig
-from flask_dapr.actor import DaprActor
-
-# from dapr.conf import settings
-from dapr_config.demo_actor import DemoActor
 
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.PublicKey import RSA
@@ -235,14 +222,14 @@ def registration_postapi(user_address):
                 recipients=[
                     email,
                 ],
-                subject = f"Hello, {first_name} {last_name}",
+                subject=f"Hello, {first_name} {last_name}",
                 sender=MAIL_SENDER,
             )
             msg.body = f"""
 
                     Welcome to digiLocker. You are now authorized to use digiLocker to store your documents.
-                    
-                    Your master key is \033[1m{master_key}\033[0m", please keep this email safe as we do not record this information, and are unable to recover it for you.
+
+                    Your master key is \033[1m{master_key}\033[0m, please keep this email safe as we do not record this information, and are unable to recover it for you.
 
                     Now, you are in full control of how your documents are shared with users.
 
@@ -268,15 +255,19 @@ def registration_postapi(user_address):
                 recipients=[
                     email,
                 ],
-                subject = f"Hello {org_name}",
+                subject=f"Hello {org_name}",
                 sender=MAIL_SENDER,
             )
             msg.body = f"""
             welcome to digiLocker. Now, your organization can access and verify documents shared by residents. We hope that you'll keep their data protected in line with the appropriate global DPRs.
 
             Below are your credentials:
-            * {pu}
-            * {pr}
+            public_key: * \033[1m{pu}\033[0m
+
+            private_key: * \033[1m{pr}\033[0m
+
+            Please keep this email safe as we are unable to retrieve these credentials for you.
+
             Regards,
             Muhammad A.
             For the digiLocker Team
@@ -438,7 +429,7 @@ def sendRequestMailToResident(user_address):
             recipients=[
                 owner_email,
             ],
-            subject = "\033[1mDocument Request\033[0m",
+            subject="\033[1mDocument Request\033[0m",
             sender=MAIL_SENDER,
         )
         msg.body = f"""
