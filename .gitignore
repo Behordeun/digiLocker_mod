@@ -139,7 +139,7 @@ logs/*
 *.env
 .env/
 ben/
-#config.py
+config.py
 screenshots/
 node_modules
 .env
