@@ -3,31 +3,24 @@ import datetime
 import hashlib
 import random
 import string
-from dotenv import load_dotenv
-from base64 import b64decode, b64encode
+# from base64 import b64decode, b64encode
 from functools import wraps
-
-from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
-from Crypto.PublicKey import RSA
-from flask import (
-    Flask,
-    flash,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
-from werkzeug.utils import secure_filename
 
 # from werkzeug import secure_filename
 import dropbox
 import jwt
+from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
+from Crypto.PublicKey import RSA
+from dotenv import load_dotenv
+from flask import (Flask, flash, jsonify, redirect, render_template, request,
+                   session, url_for)
+from flask_mail import Mail, Message
+
 import settings
-from flask_mail import Mail
-from flask_mail import Message
 from utils import *
+
+# from werkzeug.utils import secure_filename
+
 
 load_dotenv()
 
@@ -40,7 +33,7 @@ ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".p
 mail = Mail(app)
 dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
 SERVER_BASE_ADDRESS = app.config["SERVER_BASE_ADDRESS"]
-#SECRET_KEY = hashlib.sha256(app.config["SECRET_KEY"].encode("utf-8")).hexdigest()
+# SECRET_KEY = hashlib.sha256(app.config["SECRET_KEY"].encode("utf-8")).hexdigest()
 
 
 def token_required(f):
@@ -229,7 +222,7 @@ def registration_postapi(user_address):
 
                     Welcome to digiLocker. You are now authorized to use digiLocker to store your documents.
 
-                    Your master key is {master_key}, please keep this email safe as we do not record this information, and are unable to recover it for you.
+                    Your master key is '{master_key}', please keep this email safe as we do not record this information, and are unable to recover it for you.
 
                     Now, you are in full control of how your documents are shared with users.
 
@@ -262,9 +255,9 @@ def registration_postapi(user_address):
             welcome to digiLocker. Now, your organization can access and verify documents shared by residents. We hope that you'll keep their data protected in line with the appropriate global DPRs.
 
             Below are your credentials:
-            public_key: * \033[1m{pu}\033[0m
+            public_key: * '{pu}'
 
-            private_key: * \033[1m{pr}\033[0m
+            private_key: * '{pr}'
 
             Please keep this email safe as we are unable to retrieve these credentials for you.
 
@@ -429,7 +422,7 @@ def sendRequestMailToResident(user_address):
             recipients=[
                 owner_email,
             ],
-            subject="\033[1mDocument Request\033[0m",
+            subject="Document Request\033[0m",
             sender=MAIL_SENDER,
         )
         msg.body = f"""
@@ -477,7 +470,7 @@ def sendAproovedMailToRequestor(user_address):
             recipients=[
                 requester_email,
             ],
-            subject="\033[1mRequest Approved\033[0m",
+            subject="Request Approved\033[0m",
             sender=MAIL_SENDER,
         )
         msg.body = f"""
