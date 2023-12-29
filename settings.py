@@ -4,10 +4,10 @@ try:
 except:
     print("Please include the config.py in the project")
 
-#import os
-#from dotenv import load_dotenv
+# import os
+# from dotenv import load_dotenv
 
-#load_dotenv()
+# load_dotenv()
 
 SECRET_KEY = APPCONFIG.get("SECRET_KEY", None)
 MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB

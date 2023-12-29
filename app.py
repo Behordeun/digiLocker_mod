@@ -28,7 +28,7 @@ app = Flask(__name__)
 app.config.from_object(settings)
 
 
-ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".py"])
+ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".py", ".csv", ".xlsx"])
 # os.getenv.from_object(settings)
 mail = Mail(app)
 dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
