@@ -1,3 +1,2 @@
-#web: python main.py
-#web: gunicorn main:app -w 4
-web: gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app
+# Procfile
+web: gunicorn main:app -w 4 --reload --reload-extra-file app.py --worker-class gthread
