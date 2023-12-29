@@ -36,10 +36,12 @@ jsonschema==3.2.0
 kafka-python
 lru-dict
 multiaddr==0.0.9
+mypy
 netaddr==0.7.19
 oauthlib==3.1.0
 parsimonious==0.8.1
 pip
+poetry
 protobuf==3.13.0
 pycparser==2.20
 pycryptodomex
