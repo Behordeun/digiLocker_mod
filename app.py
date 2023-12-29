@@ -40,6 +40,7 @@ ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".p
 mail = Mail(app)
 dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
 SERVER_BASE_ADDRESS = app.config["SERVER_BASE_ADDRESS"]
+#SECRET_KEY = hashlib.sha256(app.config["SECRET_KEY"].encode("utf-8")).hexdigest()
 
 
 def token_required(f):
@@ -220,14 +221,15 @@ def registration_postapi(user_address):
                 recipients=[
                     email,
                 ],
-                subject=f"Hello, {first_name} {last_name}",
+                subject="Account Successfully Created",
                 sender=MAIL_SENDER,
             )
             msg.body = f"""
+                    Hello, {first_name} {last_name},
 
                     Welcome to digiLocker. You are now authorized to use digiLocker to store your documents.
 
-                    Your master key is \033[1m{master_key}\033[0m, please keep this email safe as we do not record this information, and are unable to recover it for you.
+                    Your master key is {master_key}, please keep this email safe as we do not record this information, and are unable to recover it for you.
 
                     Now, you are in full control of how your documents are shared with users.
 
@@ -475,7 +477,7 @@ def sendAproovedMailToRequestor(user_address):
             recipients=[
                 requester_email,
             ],
-            subject = "\033[1mRequest Approved\033[0m",
+            subject="\033[1mRequest Approved\033[0m",
             sender=MAIL_SENDER,
         )
         msg.body = f"""
