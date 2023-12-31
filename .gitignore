@@ -141,4 +141,7 @@ logs/*
 ben/
 config.py
 screenshots/
-.env.example
+mongo-data/
+.dapr/
+.vscode/
+config.py

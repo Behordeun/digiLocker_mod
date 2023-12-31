@@ -1,0 +1,12 @@
+dapr_dashboard:
+  runAsNonRoot: true
+dapr_placement:
+  runAsNonRoot: true
+dapr_operator:
+  runAsNonRoot: true
+dapr_sentry:
+  runAsNonRoot: true
+dapr_sidecar_injector:
+  runAsNonRoot: true
+global:
+  logAsJson: true
