@@ -14,7 +14,7 @@ dapr-client==0.4.0b1
 dapr.ext.grpc==1.2.0
 datetime
 dropbox==9.5.0
-eth-abi==2.1.1
+eth-abi==4.2.0
 eth-account==0.4.0
 eth-hash==0.2.0
 eth-keyfile==0.5.1
