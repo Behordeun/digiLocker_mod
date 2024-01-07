@@ -1,4 +1,4 @@
-function checkRegisteredUser() {
+function checkRegiterededUser() {
   getContract();
   contract.methods
     .isalreadyRegisteredUser()
@@ -11,7 +11,7 @@ function checkRegisteredUser() {
     .catch(function (error) {
       swal({
         title: "Error!",
-        text: "Error while checking user is registered or not" + error,
+        text: "Error while checking user is regitred or not" + error,
         icon: "error",
         allowOutsideClick: false,
         closeOnClickOutside: false,
@@ -23,7 +23,7 @@ $(document).ready(function () {
   $("#main-loader").hide().fadeOut("slow");
   $(".collapsible").collapsible();
   $("#dash_btn a").removeAttr("href");
-  checkRegisteredUser();
+  checkRegiterededUser();
 });
 
 $("#resident_registration").submit(function (e) {
@@ -86,7 +86,7 @@ $("#resident_registration").submit(function (e) {
             // console.log("xx", err, res)
             swal({
               title: "Success!",
-              text: "Registration Successful!! You will receive credentials via mail.",
+              text: "Registration Successful!! You will recieve credentials via mail.",
               icon: "success",
               allowOutsideClick: false,
               closeOnClickOutside: false,
@@ -138,7 +138,7 @@ function validateMasterCode() {
       if (res.valid == false) {
         swal({
           title: "Master code invalid",
-          text: "Please enter the master Code correctly!",
+          text: "Please enter the master Code corrctly!",
           icon: "warning",
           allowOutsideClick: false,
           closeOnClickOutside: false,
@@ -207,7 +207,7 @@ $("#requestor_registration").submit(function (e) {
           .then(function (res) {
             swal({
               title: "Success!",
-              text: "Registration Successful!! You will receive credentials via mail.",
+              text: "Registration Successful!! You will recieve credentials via mail.",
               icon: "success",
               allowOutsideClick: false,
               closeOnClickOutside: false,

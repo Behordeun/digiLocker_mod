@@ -110,7 +110,7 @@ $(document).on("click", ".sharedoc", function () {
                   title: "Warning!",
                   text: "You already have read \
                                                          permission for this document. \
-                                                        Or you already raised the request for this document",
+                                                        Or you already raised the request for this documen.t",
                   icon: "warning",
                   allowOutsideClick: false,
                   closeOnClickOutside: false,

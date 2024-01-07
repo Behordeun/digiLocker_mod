@@ -46,7 +46,6 @@ function loginWithSignature(
     "application/x-www-form-urlencoded; charset=UTF-8",
   );
   request.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-  //request.setRequestHeader("{{ csrf_header_name }}", csrftoken);
 
   var contract = new web3.eth.Contract(abi, contractAddress, {
     from: address,

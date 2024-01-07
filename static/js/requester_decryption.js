@@ -80,7 +80,8 @@ function downloadFile(dochash, doc_id, owner_address, privKey, ekey, doc_name) {
             closeModal: true,
             value: true,
             visible: true,
-            //className: "",
+            className: "",
+            closeModal: true,
           },
         }).then((value) => {
           if (value) {
@@ -118,7 +119,7 @@ function downloadFile(dochash, doc_id, owner_address, privKey, ekey, doc_name) {
 $(document).ready(function () {
   let doc_id = $("#requestorDecryption").attr("doc_id");
   // displayPrivateKeyField();
-  //fetching doc hash key
+  //fetching doc hask key
   contract.methods
     .getDocumentListbyDocId(doc_id)
     .call()

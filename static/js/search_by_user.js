@@ -17,7 +17,7 @@ function displayDocumentsList() {
         $("#uid").html(_glbladrress);
         //List of docs uploaded by owner we searched
         contract.methods
-          .getDocumentList(x)
+          .getDocumetList(x)
           .call()
           .then(function (docs) {
             console.log(docs);
@@ -77,7 +77,7 @@ function displayDocumentsList() {
     $("#uid").html(_glbladrress);
     //console.log(x)
     contract.methods
-      .getDocumentList(x)
+      .getDocumetList(x)
       .call()
       .then(function (docs) {
         console.log(docs);
@@ -158,7 +158,7 @@ $(document).on("click", ".sharedoc", function () {
 
   var email = "";
   contract.methods
-    .getEmailIdByAddress()
+    .getEmailIdByAddrss()
     .call()
     .then(function (_email) {
       console.log(_email);
@@ -253,7 +253,7 @@ function sendRequestMailAjaxUser(doc_id, email, doc_name) {
       owner_name = result[1] + " " + result[2];
 
       contract.methods
-        .getEmailIdByAddress()
+        .getEmailIdByAddrss()
         .call()
         .then(function (resp) {
           //Logged in users' email id and then fetching address

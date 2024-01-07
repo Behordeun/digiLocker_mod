@@ -244,7 +244,7 @@ function sendRequestMailAjax(
   };
 
   var request = new XMLHttpRequest();
-  request.open("POST", "/post/api/send/approve/mail", true);
+  request.open("POST", "/post/api/send/aproove/mail", true);
 
   request.onload = function () {
     $("#main-loader").hide();

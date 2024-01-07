@@ -24,7 +24,7 @@ function showBalance() {
 
 function displayResidentUploadedDocs() {
   contract.methods
-    .getOwnerDocumentList()
+    .getOwnerDocumetList()
     .call()
     .then(function (docs) {
       var i = 0;
@@ -144,7 +144,7 @@ $(document).on("click", ".shared_with", function () {
           `<tr>
                 <th>Serial Number</th>
                 <th>User Address</th>
-                <th>Permission</th>
+                <th>Permisson</th>
                 </tr>`,
         );
         $("#shared_doc_table tbody").html("");
@@ -278,13 +278,9 @@ $(document).on("click", ".sharedoc", function () {
                           "Content-Type",
                           "application/x-www-form-urlencoded; charset=UTF-8",
                         );
-                        //request.setRequestHeader(
-                        //  "X-CSRFToken",
-                        //  getCookie("csrftoken")
-                        //);
-                        xhr.setRequestHeader(
-                          "{{ csrf_header_name }}",
-                          csrftoken,
+                        request.setRequestHeader(
+                          "X-CSRFToken",
+                          getCookie("csrftoken"),
                         );
                         request.send(formData);
                       });
@@ -302,7 +298,7 @@ $(document).on("click", ".sharedoc", function () {
         } else {
           swal({
             title: "Error!",
-            text: "Not a valid email. This email is not a valid or not registered!!",
+            text: "Not a valid email. This email is not a valid or not regsitered!!",
             icon: "error",
             allowOutsideClick: false,
             closeOnClickOutside: false,
@@ -356,7 +352,7 @@ function sendShareMailAjax(doc_id, email, doc_name) {
                   };
 
                   var request = new XMLHttpRequest();
-                  request.open("POST", "/post/api/send/approve/mail", true);
+                  request.open("POST", "/post/api/send/aproove/mail", true);
                   request.onload = function () {
                     $("#main-loader").hide();
 
@@ -403,11 +399,10 @@ function sendShareMailAjax(doc_id, email, doc_name) {
                     "Content-Type",
                     "application/x-www-form-urlencoded; charset=UTF-8",
                   );
-                  //request.setRequestHeader(
-                  //  "X-CSRFToken",
-                  //  getCookie("csrftoken")
-                  //);
-                  request.setRequestHeader("{{ csrf_header_name }}", csrftoken);
+                  request.setRequestHeader(
+                    "X-CSRFToken",
+                    getCookie("csrftoken"),
+                  );
 
                   var formData = "";
                   for (var key in data) {
@@ -648,7 +643,7 @@ function getSharedDocListForRequestor() {
 
 function getUsrDetails() {
   contract.methods
-    .getEmailIdByAddress()
+    .getEmailIdByAddrss()
     .call()
     .then(function (usrdetails) {
       $("#email_addr").html(usrdetails[0]);

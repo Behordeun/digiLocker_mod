@@ -9,7 +9,7 @@ if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
   typeof window.web3 !== "undefined"
 ) {
   web3 = new Web3(window.web3.currentProvider);
-  // Accounts always exposed. This is those who have old version of MetaMask
+  // Acccounts always exposed. This is those who have old version of MetaMask
 }
 
 var contract = null;
@@ -141,7 +141,7 @@ $("#logout-btn").click(function (e) {
   logout();
 });
 
-function checkAlreadyRegisteredUser() {
+function checkAlreadyRegiteredUser() {
   contract = getContract();
   contract.methods
     .isalreadyRegisteredUser()
