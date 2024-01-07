@@ -3,6 +3,7 @@ import datetime
 import hashlib
 import random
 import string
+
 # from base64 import b64decode, b64encode
 from functools import wraps
 
@@ -12,8 +13,16 @@ import jwt
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.PublicKey import RSA
 from dotenv import load_dotenv
-from flask import (Flask, flash, jsonify, redirect, render_template, request,
-                   session, url_for)
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_mail import Mail, Message
 
 import settings
@@ -35,7 +44,6 @@ ALLOWED_EXTENSIONS = set(
 mail = Mail(app)
 dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
 SERVER_BASE_ADDRESS = app.config["SERVER_BASE_ADDRESS"]
-# SECRET_KEY = hashlib.sha256(app.config["SECRET_KEY"].encode("utf-8")).hexdigest()
 
 
 def token_required(f):
@@ -44,8 +52,10 @@ def token_required(f):
         if "x-access-tokens" in session.keys():
             token = session.get("x-access-tokens")
             try:
+                global data_
                 data = jwt.decode(token, app.config["SECRET_KEY"])
                 user_address = session.get("user_address")
+                data_ = data
                 return f(user_address, *args, **kwargs)
             except AttributeError as e:
                 print("AttributeError occurred", e)
@@ -96,11 +106,10 @@ def upload_file_postapi(user_address):
         return jsonify({"success": False, "status_code": 401})
     try:
         if "total_doc" not in request.form:
-            return jsonify(
-                {"success": False, "error": "No files uploaded", "status_code": 200}
-            )
-
+            return jsonify({"success": False, "error": "No files uploaded", "status_code": 200})
+        global total_doc_
         total_doc = request.form["total_doc"]
+        total_doc_ = total_doc
         file = request.files["file"]
         docHash = None
         docId = None
@@ -123,9 +132,7 @@ def upload_file_postapi(user_address):
             return {"success": False, "error": str(e)}
 
         if file.filename == "":
-            return jsonify(
-                {"success": False, "error": "No selected file", "status_code": 200}
-            )
+            return jsonify({"success": False, "error": "No selected file", "status_code": 200})
         elif file.filename.split(".")[-1] not in ALLOWED_EXTENSIONS:
             return jsonify(
                 {
@@ -136,9 +143,11 @@ def upload_file_postapi(user_address):
             )
         else:
             try:
+                global res_
                 savepath = docId + "." + file.filename.split(".")[-1]
                 savepath = f"/test_dropbox/{user_address}/{savepath}"
                 res = dropbox_.files_upload(fileContent, savepath)
+                res_ = res
             except AttributeError as e:
                 print(e, "error")
                 return {"success": False, "error": str(e)}
@@ -194,6 +203,7 @@ def comparehash_digest_nd_senddockey(user_address):
 @token_required
 def registration_postapi(user_address):
     try:
+        global user_address__
         user_address__ = request.form.get("user_address")
         if not user_address:
             return jsonify({"success": False, "status_code": 401})
@@ -289,8 +299,7 @@ def registration_postapi(user_address):
 @app.route("/api/login/metamask", methods=["GET"])
 def login_api():
     urandomToken = "".join(
-        random.SystemRandom().choice(string.ascii_letters + string.digits)
-        for i in range(32)
+        random.SystemRandom().choice(string.ascii_letters + string.digits) for i in range(32)
     )
     token = jwt.encode(
         {
@@ -383,9 +392,7 @@ def searchUser(user_address):
     if not request.args.get("uid", None):
         return redirect("/dashboard", code=400)
 
-    return render_template(
-        "searchUser.html", user_address=user_address, uid=request.args["uid"]
-    )
+    return render_template("searchUser.html", user_address=user_address, uid=request.args["uid"])
 
 
 @app.route("/search/doc", methods=["GET"])
@@ -430,9 +437,7 @@ def sendRequestMailToResident(user_address):
         msg.body = f"""
             Hello {owner_name}, {requester_email} is requesting access to {doc_name} please review the request and accept/decline the request via {approval_url}"""
         mail.send(msg)
-        return jsonify(
-            {"success": True, "redirect_url": "/dashboard", "status_code": 200}
-        )
+        return jsonify({"success": True, "redirect_url": "/dashboard", "status_code": 200})
     except AttributeError as e:
         return jsonify({"success": False, "error": str(e), "status_code": 400})
 
@@ -506,9 +511,7 @@ def approoveDoc(user_address):
     if owner_address != user_address:
         session.pop("x-access-tokens", None)
         session.pop("user_address", None)
-        flash(
-            "Not a correct account address, you are logged in with. Try with different account."
-        )
+        flash("Not a correct account address, you are logged in with. Try with different account.")
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
 
     return render_template(
