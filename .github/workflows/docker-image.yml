@@ -7,13 +7,19 @@ name: Docker
 
 on:
   schedule:
-    - cron: '21 16 * * *'
+    - cron: 21 16 * * *
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+      - dev-2
+      - digilocker_heroku
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+      - dev-2
+      - digilocker_heroku
 
 env:
   # Use docker.io for Docker Hub if empty
