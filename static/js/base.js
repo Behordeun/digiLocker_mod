@@ -9,7 +9,7 @@ if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
   typeof window.web3 !== "undefined"
 ) {
   web3 = new Web3(window.web3.currentProvider);
-  // Acccounts always exposed. This is those who have old version of MetaMask
+  // Accounts always exposed. This is those who have old version of MetaMask
 }
 
 var contract = null;
@@ -32,7 +32,7 @@ function getUrlVars() {
     /[?&]+([^=&]+)=([^&]*)/gi,
     function (m, key, value) {
       vars[key] = value;
-    }
+    },
   );
   return vars;
 }
@@ -119,7 +119,7 @@ function logout() {
       var resp = JSON.parse(request.responseText);
       if (window.location.href.indexOf("next") > -1) {
         let next = decodeURIComponent(
-          window.location.search.replace("?next=", "")
+          window.location.search.replace("?next=", ""),
         );
         let path = window.location.origin + "/" + next;
         window.location.replace(decodeURIComponent(path));
@@ -141,7 +141,7 @@ $("#logout-btn").click(function (e) {
   logout();
 });
 
-function checkAlreadyRegiteredUser() {
+function checkAlreadyRegisteredUser() {
   contract = getContract();
   contract.methods
     .isalreadyRegisteredUser()

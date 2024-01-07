@@ -28,7 +28,9 @@ app = Flask(__name__)
 app.config.from_object(settings)
 
 
-ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".py", ".csv", ".xlsx"])
+ALLOWED_EXTENSIONS = set(
+    ["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".py", ".csv", ".xlsx"]
+)
 # os.getenv.from_object(settings)
 mail = Mail(app)
 dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
@@ -417,7 +419,7 @@ def sendRequestMailToResident(user_address):
         owner_email = request.form.get("owner_email")
         owner_name = request.form.get("owner_name")
 
-        approval_url = f"{SERVER_BASE_ADDRESS}/resident/aproove/doc/?requester={requester_address}&owner={owner_address}&doc_id={doc_id}"
+        approval_url = f"{SERVER_BASE_ADDRESS}/resident/approve/doc/?requester={requester_address}&owner={owner_address}&doc_id={doc_id}"
         msg = Message(
             recipients=[
                 owner_email,
@@ -435,9 +437,9 @@ def sendRequestMailToResident(user_address):
         return jsonify({"success": False, "error": str(e), "status_code": 400})
 
 
-@app.route("/post/api/send/aproove/mail", methods=["POST"])
+@app.route("/post/api/send/approve/mail", methods=["POST"])
 @token_required
-def sendAproovedMailToRequestor(user_address):
+def sendapprovedMailToRequestor(user_address):
     if not user_address:
         return jsonify({"success": False, "status_code": 401})
     try:
@@ -487,7 +489,7 @@ def sendAproovedMailToRequestor(user_address):
         return jsonify({"success": False, "error": str(e), "status_code": 400})
 
 
-@app.route("/resident/aproove/doc/", methods=["GET"])
+@app.route("/resident/approve/doc/", methods=["GET"])
 @token_required
 def approoveDoc(user_address):
     if not user_address:
@@ -538,7 +540,7 @@ def access_doc(user_address):
         session.pop("x-access-tokens", None)
         session.pop("user_address", None)
         flash(
-            "Not a correct account address, you are logined with. Try with different account."
+            "Not a correct account address, you are logging in with. Try with different account."
         )
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
 

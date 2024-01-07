@@ -24,7 +24,7 @@ function showBalance() {
 
 function displayResidentUploadedDocs() {
   contract.methods
-    .getOwnerDocumetList()
+    .getOwnerDocumentList()
     .call()
     .then(function (docs) {
       var i = 0;
@@ -50,20 +50,20 @@ function displayResidentUploadedDocs() {
             <th>Uploaded Date</th>
             <th>Shared with</th>
             <th>Action</th>
-            </tr>`
+            </tr>`,
       );
       if (documents.length == 0)
         $("#document_table tbody").html(
           "<br><center style = 'color:red'>\
-                <h6>You haven't uploaded any document yet.</h6></center>"
+                <h6>You haven't uploaded any document yet.</h6></center>",
         );
       else $("#document_table tbody").html("");
 
       for (var j = 0; j < documents.length; j++) {
         $("#document_table tbody").append(
           `<tr>
-                <td><a class = 'tooltipped' 
-                data-position="bottom" data-tooltip="${documents[j].doc_id}" 
+                <td><a class = 'tooltipped'
+                data-position="bottom" data-tooltip="${documents[j].doc_id}"
                 >Doc #${j + 1}</td>
                 <td>${documents[j].filename}</td>
                 <td>${documents[j].timestamp}</td>
@@ -74,12 +74,12 @@ function displayResidentUploadedDocs() {
                 doc_name="${documents[j].filename}"
                 >Click to Reveal<i class="material-icons tiny left">folder_shared</i>
                 </button></td>
-                <td><button 
+                <td><button
                     class = "btn btn-primary sharedoc"
                     doc_id="${documents[j].doc_id}"
                     doc_name="${documents[j].filename}">
 					Share<i class="material-icons tiny left">share</i></button></td>
-                </tr>`
+                </tr>`,
         );
       }
       $(".tooltipped").tooltip();
@@ -131,21 +131,21 @@ $(document).on("click", ".shared_with", function () {
         fromBlock: 0,
         toBlock: "latest",
       },
-      function (error, events) {}
+      function (error, events) {},
     )
     .then(function (events) {
       if (events.length == 0)
         $("#shared_doc_table tbody").html(
           "<br><center style = 'color:red'>\
-                <h6>This document is not shared with anyone.</h6></center>"
+                <h6>This document is not shared with anyone.</h6></center>",
         );
       else {
         $("#shared_doc_table thead").html(
           `<tr>
                 <th>Serial Number</th>
                 <th>User Address</th>
-                <th>Permisson</th>
-                </tr>`
+                <th>Permission</th>
+                </tr>`,
         );
         $("#shared_doc_table tbody").html("");
         for (var j = 0; j < events.length; j++) {
@@ -157,7 +157,7 @@ $(document).on("click", ".shared_with", function () {
                     <td>#${j + 1}</td>
                     <td>${events[j].returnValues.sharedWith}</td>
                     <td>${ptype}</td>
-                    </tr>`
+                    </tr>`,
           );
         }
       }
@@ -211,7 +211,7 @@ $(document).on("click", ".sharedoc", function () {
                     fromBlock: 0,
                     toBlock: "latest",
                   },
-                  function (error, events) {}
+                  function (error, events) {},
                 )
                 .then(function (docs) {
                   if (!docs.length) {
@@ -240,7 +240,7 @@ $(document).on("click", ".sharedoc", function () {
                                 .shareDocumentwithUser(
                                   doc_id,
                                   permission,
-                                  req_address
+                                  req_address,
                                 )
                                 .send()
                                 .then(function (res3) {
@@ -276,11 +276,15 @@ $(document).on("click", ".sharedoc", function () {
                         formData += "&upload=" + "0";
                         request.setRequestHeader(
                           "Content-Type",
-                          "application/x-www-form-urlencoded; charset=UTF-8"
+                          "application/x-www-form-urlencoded; charset=UTF-8",
                         );
-                        request.setRequestHeader(
-                          "X-CSRFToken",
-                          getCookie("csrftoken")
+                        //request.setRequestHeader(
+                        //  "X-CSRFToken",
+                        //  getCookie("csrftoken")
+                        //);
+                        xhr.setRequestHeader(
+                          "{{ csrf_header_name }}",
+                          csrftoken,
                         );
                         request.send(formData);
                       });
@@ -298,7 +302,7 @@ $(document).on("click", ".sharedoc", function () {
         } else {
           swal({
             title: "Error!",
-            text: "Not a valid email. This email is not a valid or not regsitered!!",
+            text: "Not a valid email. This email is not a valid or not registered!!",
             icon: "error",
             allowOutsideClick: false,
             closeOnClickOutside: false,
@@ -352,7 +356,7 @@ function sendShareMailAjax(doc_id, email, doc_name) {
                   };
 
                   var request = new XMLHttpRequest();
-                  request.open("POST", "/post/api/send/aproove/mail", true);
+                  request.open("POST", "/post/api/send/approve/mail", true);
                   request.onload = function () {
                     $("#main-loader").hide();
 
@@ -397,12 +401,13 @@ function sendShareMailAjax(doc_id, email, doc_name) {
                   };
                   request.setRequestHeader(
                     "Content-Type",
-                    "application/x-www-form-urlencoded; charset=UTF-8"
+                    "application/x-www-form-urlencoded; charset=UTF-8",
                   );
-                  request.setRequestHeader(
-                    "X-CSRFToken",
-                    getCookie("csrftoken")
-                  );
+                  //request.setRequestHeader(
+                  //  "X-CSRFToken",
+                  //  getCookie("csrftoken")
+                  //);
+                  request.setRequestHeader("{{ csrf_header_name }}", csrftoken);
 
                   var formData = "";
                   for (var key in data) {
@@ -437,7 +442,7 @@ function getDocName(docid, owner_address) {
     .call()
     .then(function (docname) {
       $(`.docname[doc_id="${docid}"][docOwner="${owner_address}"]`).html(
-        docname
+        docname,
       );
     });
 }
@@ -461,7 +466,7 @@ $(document).on("click", ".verify_doc", function () {
       },
       function (error, events) {
         console.log(events, "xxx");
-      }
+      },
     )
     .then(function (vlist) {
       if (vlist.length == 0) {
@@ -473,7 +478,7 @@ $(document).on("click", ".verify_doc", function () {
             $("#doc_id").html(doc_id);
             $("#doc_owner").html(doc_owner);
             $(".doc_name_modal").html(
-              "Verification of the Document :" + docname
+              "Verification of the Document :" + docname,
             );
             $("#doc_name").html(docname);
 
@@ -497,7 +502,7 @@ $(document).on("click", ".verify_doc", function () {
                 .catch(function (error) {
                   console.log(
                     "verifyUserDocument() contract calling failed-" +
-                      error.message
+                      error.message,
                   );
                   swal({
                     title: "Error!",
@@ -515,7 +520,7 @@ $(document).on("click", ".verify_doc", function () {
           })
           .catch(function (error) {
             console.log(
-              "error while calling getDocumentName() -" + error.message
+              "error while calling getDocumentName() -" + error.message,
             );
           });
       } //end if
@@ -545,7 +550,7 @@ function getSharedDocListForRequestor() {
         fromBlock: 0,
         toBlock: "latest",
       },
-      function (error, events) {}
+      function (error, events) {},
     )
     .then(function (docs) {
       for (var k = 0; k < docs.length; k++) {
@@ -574,16 +579,16 @@ function getSharedDocListForRequestor() {
             $("#sharedDocumentListByUser ul").append(
               `
                     <li>
-                    <div class="collapsible-header">  
+                    <div class="collapsible-header">
                     <i class="material-icons">mail</i>
                     ${usrdetails[0]}: ${usrdetails[1]} ${usrdetails[2]}
-                    
+
                     <span class="badge blue new" data-badge-caption="">
                         ${docGroup[property].length}</span>
                         <i class="material-icons">expand_more</i>
                     </div>
                     <div class="collapsible-body">
-                    <table property = "${property}" 
+                    <table property = "${property}"
                         class = "responsive-table highlight">
                     <thead>
                     </thead>
@@ -597,7 +602,7 @@ function getSharedDocListForRequestor() {
                     </tbody>
                     </div>
                 </li>
-                `
+                `,
             );
             for (var j = 0; j < docGroup[property].length; j++) {
               //var doc_name = docGroup[property][j].docName;
@@ -606,13 +611,13 @@ function getSharedDocListForRequestor() {
               else ptype = "Modify";
 
               $(
-                `#sharedDocumentListByUser ul table[property="${property}"]`
+                `#sharedDocumentListByUser ul table[property="${property}"]`,
               ).append(
                 `<tr>
                         <td doc_id = "${
                           docGroup[property][j].docId
                         }">Document#${j + 1}</td>
-                        <td class = "docname" 
+                        <td class = "docname"
                         doc_id = "${docGroup[property][j].docId}"
                         docOwner = "${property}"
                         >${docGroup[property][j].docName}</td>
@@ -621,7 +626,7 @@ function getSharedDocListForRequestor() {
                           docGroup[property][j].docId
                         }" docOwner = "${property}">
                         <i class="material-icons tiny left">verified_user</i>Verify</a></td>
-                        </tr>`
+                        </tr>`,
               );
             }
           });
@@ -643,7 +648,7 @@ function getSharedDocListForRequestor() {
 
 function getUsrDetails() {
   contract.methods
-    .getEmailIdByAddrss()
+    .getEmailIdByAddress()
     .call()
     .then(function (usrdetails) {
       $("#email_addr").html(usrdetails[0]);
