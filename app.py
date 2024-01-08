@@ -3,16 +3,14 @@ import datetime
 import hashlib
 import random
 import string
-
-# from base64 import b64decode, b64encode
 from functools import wraps
 
-# from werkzeug import secure_filename
 import dropbox
 import jwt
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.PublicKey import RSA
 from dotenv import load_dotenv
+from dropbox.exceptions import AuthError
 from flask import (
     Flask,
     flash,
@@ -28,9 +26,6 @@ from flask_mail import Mail, Message
 import settings
 from utils import *
 
-# from werkzeug.utils import secure_filename
-
-
 load_dotenv()
 
 app = Flask(__name__)
@@ -40,7 +35,8 @@ app.config.from_object(settings)
 ALLOWED_EXTENSIONS = set(
     ["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".py", ".csv", ".xlsx"]
 )
-# os.getenv.from_object(settings)
+
+
 mail = Mail(app)
 dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
 SERVER_BASE_ADDRESS = app.config["SERVER_BASE_ADDRESS"]
@@ -52,7 +48,6 @@ def token_required(f):
         if "x-access-tokens" in session.keys():
             token = session.get("x-access-tokens")
             try:
-                global data_
                 data = jwt.decode(token, app.config["SECRET_KEY"])
                 user_address = session.get("user_address")
                 data_ = data
@@ -107,9 +102,8 @@ def upload_file_postapi(user_address):
     try:
         if "total_doc" not in request.form:
             return jsonify({"success": False, "error": "No files uploaded", "status_code": 200})
-        global total_doc_
+
         total_doc = request.form["total_doc"]
-        total_doc_ = total_doc
         file = request.files["file"]
         docHash = None
         docId = None
@@ -143,11 +137,9 @@ def upload_file_postapi(user_address):
             )
         else:
             try:
-                global res_
                 savepath = docId + "." + file.filename.split(".")[-1]
                 savepath = f"/test_dropbox/{user_address}/{savepath}"
                 res = dropbox_.files_upload(fileContent, savepath)
-                res_ = res
             except AttributeError as e:
                 print(e, "error")
                 return {"success": False, "error": str(e)}
@@ -177,8 +169,7 @@ def comparehash_digest_nd_senddockey(user_address):
 
         mkey_digest_new = hashlib.sha256()
         mkey_digest_new.update(master_key.strip().encode())
-        mkey_digest_new.update(app.config["SECRET_KEY"])
-        # mkey_digest_new.update(user_address.encode())
+        mkey_digest_new.update(app.config["SECRET_KEY"].encode("utf-8"))
         mkey_digest_new = mkey_digest_new.hexdigest()
 
         if "0x" + mkey_digest_new == mkeydigest:
@@ -203,7 +194,6 @@ def comparehash_digest_nd_senddockey(user_address):
 @token_required
 def registration_postapi(user_address):
     try:
-        global user_address__
         user_address__ = request.form.get("user_address")
         if not user_address:
             return jsonify({"success": False, "status_code": 401})

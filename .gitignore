@@ -163,3 +163,4 @@ environment.yml
 .history/
 .vscode/
 tmp.Dockerfile
+.cache_ggshield
