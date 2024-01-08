@@ -3,10 +3,10 @@
 ## Complete the following steps to get Docker running locally
 
 # Step 1:
-#docker build -t digilocker-mod:dev-2 .
+docker build -t digilocker-mod:digilocker_heroku .
 
 # Step 2:
-#docker images
+docker images
 
 # Step 3:
-docker run -p 8083:8083 herbehordeun/digilocker_mod:digilocker_heroku
+docker run -p 8083:8083 digilocker-mod:digilocker_heroku
