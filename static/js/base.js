@@ -32,7 +32,7 @@ function getUrlVars() {
     /[?&]+([^=&]+)=([^&]*)/gi,
     function (m, key, value) {
       vars[key] = value;
-    }
+    },
   );
   return vars;
 }
@@ -119,7 +119,7 @@ function logout() {
       var resp = JSON.parse(request.responseText);
       if (window.location.href.indexOf("next") > -1) {
         let next = decodeURIComponent(
-          window.location.search.replace("?next=", "")
+          window.location.search.replace("?next=", ""),
         );
         let path = window.location.origin + "/" + next;
         window.location.replace(decodeURIComponent(path));

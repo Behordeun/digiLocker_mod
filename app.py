@@ -3,12 +3,14 @@ import datetime
 import hashlib
 import random
 import string
-from dotenv import load_dotenv
-from base64 import b64decode, b64encode
 from functools import wraps
 
+import dropbox
+import jwt
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.PublicKey import RSA
+from dotenv import load_dotenv
+from dropbox.exceptions import AuthError
 from flask import (
     Flask,
     flash,
@@ -19,14 +21,9 @@ from flask import (
     session,
     url_for,
 )
-from werkzeug.utils import secure_filename
+from flask_mail import Mail, Message
 
-# from werkzeug import secure_filename
-import dropbox
-import jwt
 import settings
-from flask_mail import Mail
-from flask_mail import Message
 from utils import *
 
 load_dotenv()
@@ -35,8 +32,11 @@ app = Flask(__name__)
 app.config.from_object(settings)
 
 
-ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".py"])
-# os.getenv.from_object(settings)
+ALLOWED_EXTENSIONS = set(
+    ["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".py", ".csv", ".xlsx"]
+)
+
+
 mail = Mail(app)
 dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
 SERVER_BASE_ADDRESS = app.config["SERVER_BASE_ADDRESS"]
@@ -50,6 +50,7 @@ def token_required(f):
             try:
                 data = jwt.decode(token, app.config["SECRET_KEY"])
                 user_address = session.get("user_address")
+                data_ = data
                 return f(user_address, *args, **kwargs)
             except AttributeError as e:
                 print("AttributeError occurred", e)
@@ -100,9 +101,7 @@ def upload_file_postapi(user_address):
         return jsonify({"success": False, "status_code": 401})
     try:
         if "total_doc" not in request.form:
-            return jsonify(
-                {"success": False, "error": "No files uploaded", "status_code": 200}
-            )
+            return jsonify({"success": False, "error": "No files uploaded", "status_code": 200})
 
         total_doc = request.form["total_doc"]
         file = request.files["file"]
@@ -127,9 +126,7 @@ def upload_file_postapi(user_address):
             return {"success": False, "error": str(e)}
 
         if file.filename == "":
-            return jsonify(
-                {"success": False, "error": "No selected file", "status_code": 200}
-            )
+            return jsonify({"success": False, "error": "No selected file", "status_code": 200})
         elif file.filename.split(".")[-1] not in ALLOWED_EXTENSIONS:
             return jsonify(
                 {
@@ -172,8 +169,7 @@ def comparehash_digest_nd_senddockey(user_address):
 
         mkey_digest_new = hashlib.sha256()
         mkey_digest_new.update(master_key.strip().encode())
-        mkey_digest_new.update(app.config["SECRET_KEY"])
-        # mkey_digest_new.update(user_address.encode())
+        mkey_digest_new.update(app.config["SECRET_KEY"].encode("utf-8"))
         mkey_digest_new = mkey_digest_new.hexdigest()
 
         if "0x" + mkey_digest_new == mkeydigest:
@@ -220,14 +216,15 @@ def registration_postapi(user_address):
                 recipients=[
                     email,
                 ],
-                subject=f"Hello, {first_name} {last_name}",
+                subject="Account Successfully Created",
                 sender=MAIL_SENDER,
             )
             msg.body = f"""
+                    Hello, {first_name} {last_name},
 
                     Welcome to digiLocker. You are now authorized to use digiLocker to store your documents.
 
-                    Your master key is \033[1m{master_key}\033[0m, please keep this email safe as we do not record this information, and are unable to recover it for you.
+                    Your master key is '{master_key}', please keep this email safe as we do not record this information, and are unable to recover it for you.
 
                     Now, you are in full control of how your documents are shared with users.
 
@@ -260,9 +257,9 @@ def registration_postapi(user_address):
             welcome to digiLocker. Now, your organization can access and verify documents shared by residents. We hope that you'll keep their data protected in line with the appropriate global DPRs.
 
             Below are your credentials:
-            public_key: * \033[1m{pu}\033[0m
+            public_key: * '{pu}'
 
-            private_key: * \033[1m{pr}\033[0m
+            private_key: * '{pr}'
 
             Please keep this email safe as we are unable to retrieve these credentials for you.
 
@@ -292,8 +289,7 @@ def registration_postapi(user_address):
 @app.route("/api/login/metamask", methods=["GET"])
 def login_api():
     urandomToken = "".join(
-        random.SystemRandom().choice(string.ascii_letters + string.digits)
-        for i in range(32)
+        random.SystemRandom().choice(string.ascii_letters + string.digits) for i in range(32)
     )
     token = jwt.encode(
         {
@@ -386,9 +382,7 @@ def searchUser(user_address):
     if not request.args.get("uid", None):
         return redirect("/dashboard", code=400)
 
-    return render_template(
-        "searchUser.html", user_address=user_address, uid=request.args["uid"]
-    )
+    return render_template("searchUser.html", user_address=user_address, uid=request.args["uid"])
 
 
 @app.route("/search/doc", methods=["GET"])
@@ -422,27 +416,25 @@ def sendRequestMailToResident(user_address):
         owner_email = request.form.get("owner_email")
         owner_name = request.form.get("owner_name")
 
-        approval_url = f"{SERVER_BASE_ADDRESS}/resident/aproove/doc/?requester={requester_address}&owner={owner_address}&doc_id={doc_id}"
+        approval_url = f"{SERVER_BASE_ADDRESS}/resident/approve/doc/?requester={requester_address}&owner={owner_address}&doc_id={doc_id}"
         msg = Message(
             recipients=[
                 owner_email,
             ],
-            subject="\033[1mDocument Request\033[0m",
+            subject="Document Request\033[0m",
             sender=MAIL_SENDER,
         )
         msg.body = f"""
             Hello {owner_name}, {requester_email} is requesting access to {doc_name} please review the request and accept/decline the request via {approval_url}"""
         mail.send(msg)
-        return jsonify(
-            {"success": True, "redirect_url": "/dashboard", "status_code": 200}
-        )
+        return jsonify({"success": True, "redirect_url": "/dashboard", "status_code": 200})
     except AttributeError as e:
         return jsonify({"success": False, "error": str(e), "status_code": 400})
 
 
-@app.route("/post/api/send/aproove/mail", methods=["POST"])
+@app.route("/post/api/send/approve/mail", methods=["POST"])
 @token_required
-def sendAproovedMailToRequestor(user_address):
+def sendapprovedMailToRequestor(user_address):
     if not user_address:
         return jsonify({"success": False, "status_code": 401})
     try:
@@ -475,7 +467,7 @@ def sendAproovedMailToRequestor(user_address):
             recipients=[
                 requester_email,
             ],
-            subject = "\033[1mRequest Approved\033[0m",
+            subject="Request Approved\033[0m",
             sender=MAIL_SENDER,
         )
         msg.body = f"""
@@ -492,7 +484,7 @@ def sendAproovedMailToRequestor(user_address):
         return jsonify({"success": False, "error": str(e), "status_code": 400})
 
 
-@app.route("/resident/aproove/doc/", methods=["GET"])
+@app.route("/resident/approve/doc/", methods=["GET"])
 @token_required
 def approoveDoc(user_address):
     if not user_address:
@@ -509,9 +501,7 @@ def approoveDoc(user_address):
     if owner_address != user_address:
         session.pop("x-access-tokens", None)
         session.pop("user_address", None)
-        flash(
-            "Not a correct account address, you are logged in with. Try with different account."
-        )
+        flash("Not a correct account address, you are logged in with. Try with different account.")
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
 
     return render_template(
@@ -543,7 +533,7 @@ def access_doc(user_address):
         session.pop("x-access-tokens", None)
         session.pop("user_address", None)
         flash(
-            "Not a correct account address, you are logined with. Try with different account."
+            "Not a correct account address, you are logging in with. Try with different account."
         )
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
 

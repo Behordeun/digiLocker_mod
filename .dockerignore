@@ -3,3 +3,5 @@ README.md
 docker-compose.yml
 LICENSE
 venv/
+.vscode/
+.history/

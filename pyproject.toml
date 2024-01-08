@@ -8,6 +8,25 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "3.9.18"
 
+[tool.black]
+line-length = 99 # override black's default line-length
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.tox
+  | venv
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+# make it compatible with black
+profile = "black"
 
 [build-system]
 requires = ["poetry-core"]
