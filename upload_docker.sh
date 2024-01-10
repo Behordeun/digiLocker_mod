@@ -7,7 +7,7 @@
 # Create dockerpath
 dockerpath=herbehordeun/digilocker-mod
 
-# Step 2:  
+# Step 2:
 # Authenticate & tag
 docker login --username=herbehordeun
 docker image tag digilocker-mod $dockerpath
