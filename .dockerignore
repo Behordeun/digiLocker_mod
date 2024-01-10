@@ -5,3 +5,5 @@ LICENSE
 venv/
 .vscode/
 .history/
+tmp.Dockerfile
+.cache_ggshield

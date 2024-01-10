@@ -209,7 +209,7 @@ def registration_postapi(user_address):
             # TODO: ADD MORE PARAMS IN HASH
             mkey_digest = hashlib.sha256()
             mkey_digest.update(master_key.strip().encode())
-            mkey_digest.update(app.config["SECRET_KEY"].encode("utf-8"))
+            mkey_digest.update(app.config["SECRET_KEY"].encode('utf-8'))
             mkey_digest = mkey_digest.hexdigest()
 
             msg = Message(
