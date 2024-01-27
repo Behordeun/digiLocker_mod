@@ -6,7 +6,7 @@ spec:
   selector:
     app: digilocker-app
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8083
+    - protocol: TCP
+      port: 80
+      targetPort: 8083
   type: LoadBalancer
