@@ -5,13 +5,13 @@
 
 # Step 1:
 # Create dockerpath
-dockerpath=herbehordeun/digilocker-mod
+dockerpath=herbehordeun/digilocker_mod:latest
 
-# Step 2:
+# Step 2:  
 # Authenticate & tag
 docker login --username=herbehordeun
-docker image tag digilocker-mod $dockerpath
+docker image tag digilocker-mod:digilocker_heroku $dockerpath
 echo "Docker ID and Image: $dockerpath"
 
 # Step 3:
-docker push $dockerpath:latest
+docker push $dockerpath
