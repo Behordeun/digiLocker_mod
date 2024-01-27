@@ -9,4 +9,4 @@ docker build -t digilocker:latest .
 docker images
 
 # Step 3:
-docker run -p 8083:8083 digilocker:latest
+docker run -p 8083:8083 -d digilocker:latest

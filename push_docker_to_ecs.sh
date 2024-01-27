@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# This file tags and uploads an image to AWS ECR
+
+# Assumes that an image is built via `run_docker.sh`
+
 # Step 1:
 # Login into ECR
 
