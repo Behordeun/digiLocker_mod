@@ -15,6 +15,7 @@ def recover_to_addr(token, signature):
     res = is_hex_address(address)
     return address
 
+
 def generateRSAKeypair():
     keyPair = RSA.generate(2048)
     return (
@@ -22,21 +23,23 @@ def generateRSAKeypair():
         keyPair.export_key().decode()
     )
 
+
 def getKey(total_doc, masterKey, user_address):
     salt = user_address.lower().strip().encode()
     masterKey = masterKey.strip().encode()
-    keys = PBKDF2(masterKey, salt, 512, count=1000, prf= None)
+    keys = PBKDF2(masterKey, salt, 512, count=1000, prf=None)
     keys = binascii.hexlify(keys)
-    startIndex = (total_doc*16)%450
+    startIndex = (total_doc*16) % 450
     if startIndex + 128 >= 500:
-        startIndex = total_doc%256
+        startIndex = total_doc % 256
     key = keys[startIndex:startIndex+128]
     return key.decode()
+
 
 def prepareMailMsg(name, from_mail, address, pr, MAIL_SENDER):
     msg = Message(
         recipients=[from_mail.strip(),],
-        sender = MAIL_SENDER
+        sender=MAIL_SENDER
     )
 
     msgHtml = f"""
@@ -122,11 +125,12 @@ def prepareRequestMail(
     """
     msg = Message(
         recipients=[owner_email.strip(),],
-        sender = MAIL_SENDER
+        sender=MAIL_SENDER
     )
     msg.html = msgHtml
     msg.subject = f"Read access Request for document: {doc_name} by {requester_email}"
     return msg
+
 
 def prepareApro0vedMail(
         owner_name,
@@ -181,7 +185,7 @@ def prepareApro0vedMail(
     """
     msg = Message(
         recipients=[requester_email.strip(),],
-        sender = MAIL_SENDER
+        sender=MAIL_SENDER
     )
     msg.html = msgHtml
     msg.subject = f"{owner_name} shared document with you"

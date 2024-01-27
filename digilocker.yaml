@@ -13,14 +13,14 @@ spec:
         app: digilocker-app
     spec:
       containers:
-        - name: digilocker-app
-          image: docker.io/herbehordeun/digilocker:latest
-          ports:
-            - containerPort: 8083
-          resources:
-            limits:
-              cpu: "1" # Set CPU limit (e.g., 0.5 cores)
-              memory: "1024Mi" # Set memory limit (e.g., 512 megabytes)
-            requests:
-              cpu: "0.1" # Set CPU request (optional)
-              memory: "512Mi" # Set memory request (optional)
+      - name: digilocker-app
+        image: digilocker-mod:digilocker_heroku
+        ports:
+        - containerPort: 8083
+        resources:
+          limits:
+            cpu: "1" # Set CPU limit (e.g., 0.5 cores)
+            memory: "1024Mi" # Set memory limit (e.g., 512 megabytes)
+          requests:
+            cpu: "0.1" # Set CPU request (optional)
+            memory: "512Mi" # Set memory request (optional)

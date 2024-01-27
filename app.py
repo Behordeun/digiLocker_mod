@@ -3,14 +3,16 @@ import datetime
 import hashlib
 import random
 import string
+import threading
+import time
 from functools import wraps
 
 import dropbox
+from dropbox.exceptions import AuthError
 import jwt
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.PublicKey import RSA
 from dotenv import load_dotenv
-from dropbox.exceptions import AuthError
 from flask import (
     Flask,
     flash,
@@ -42,7 +44,45 @@ dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
 SERVER_BASE_ADDRESS = app.config["SERVER_BASE_ADDRESS"]
 
 
+def refresh_dropbox_token():
+    while True:
+        try:
+            flow = dropbox.DropboxOAuth2FlowNoRedirect(
+                app.config["DROPBOX_APP_KEY"], app.config["DROPBOX_APP_SECRET"]
+            )
+
+            # Obtain a new access token
+            new_token = flow.refresh_access_token(app.config["DROPBOX_REFRESH_TOKEN"])
+
+            # Update the Dropbox instance with the new access token
+            dropbox_.auth = new_token
+
+            print("Dropbox token refreshed successfully.")
+
+            # Sleep for a certain interval before refreshing again
+            time.sleep(app.config["DROPBOX_TOKEN_REFRESH_INTERVAL"])
+        except AuthError as e:
+            print(f"Error refreshing Dropbox token: {e}")
+            # Handle the error as needed
+            time.sleep(app.config["DROPBOX_TOKEN_REFRESH_INTERVAL"])
+
+
+# Start a thread for the token refresh process
+token_refresh_thread = threading.Thread(target=refresh_dropbox_token)
+token_refresh_thread.daemon = True
+token_refresh_thread.start()
+
+
 def token_required(f):
+    """_summary_
+
+    Args:
+        f (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     @wraps(f)
     def decorator(*args, **kwargs):
         if "x-access-tokens" in session.keys():
@@ -64,12 +104,28 @@ def token_required(f):
 @app.route("/")
 @token_required
 def index(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     return render_template("index.html", user_address=user_address)
 
 
 @app.route("/dashboard", methods=["GET"])
 @token_required
 def dashboard(user_address=None):
+    """_summary_
+
+    Args:
+        user_address (_type_, optional): _description_. Defaults to None.
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         flash("You are not authenticated. Please login again!")
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
@@ -79,6 +135,14 @@ def dashboard(user_address=None):
 @app.route("/registration")
 @token_required
 def registration(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         flash("You are not authenticated. Please login again!")
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
@@ -88,6 +152,14 @@ def registration(user_address):
 @app.route("/dashboard/upload/doc", methods=["GET"])
 @token_required
 def upload_file(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         flash("You are not authenticated. Please login again!")
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
@@ -97,6 +169,14 @@ def upload_file(user_address):
 @app.route("/post/api/upload/doc", methods=["POST"])
 @token_required
 def upload_file_postapi(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         return jsonify({"success": False, "status_code": 401})
     try:
@@ -160,6 +240,14 @@ def upload_file_postapi(user_address):
 @app.route("/api/user/accesskey", methods=["POST"])
 @token_required
 def comparehash_digest_nd_senddockey(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         return jsonify({"success": False, "status_code": 401})
     try:
@@ -193,6 +281,14 @@ def comparehash_digest_nd_senddockey(user_address):
 @app.route("/api/user/registration/", methods=["POST"])
 @token_required
 def registration_postapi(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     try:
         user_address__ = request.form.get("user_address")
         if not user_address:
@@ -288,6 +384,11 @@ def registration_postapi(user_address):
 
 @app.route("/api/login/metamask", methods=["GET"])
 def login_api():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     urandomToken = "".join(
         random.SystemRandom().choice(string.ascii_letters + string.digits) for i in range(32)
     )
@@ -308,6 +409,11 @@ def login_api():
 
 @app.route("/api/login/metamask", methods=["POST"])
 def login_postapi():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     token = session.get("x-access-tokens")
     if not token:
         return {
@@ -337,6 +443,14 @@ def login_postapi():
 @app.route("/api/get/verify/master/code", methods=["GET"])
 @token_required
 def verifyMasterCode(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     try:
         if request.args.get("master_code", None) in app.config["VERIFICATION_CODES"]:
             return {"success": True, "valid": True, "status_code": 200}
@@ -350,6 +464,14 @@ def verifyMasterCode(user_address):
 @app.route("/api/logout/metamask", methods=["GET"])
 @token_required
 def logout(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     print("logout")
     session.pop("x-access-tokens", None)
     session.pop("user_address", None)
@@ -359,6 +481,14 @@ def logout(user_address):
 @app.route("/dashboard", methods=["POST"])
 @token_required
 def dashboardPost(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         return redirect(url_for("index", next=request.path))
 
@@ -374,6 +504,14 @@ def dashboardPost(user_address):
 @app.route("/search/uid", methods=["GET"])
 @token_required
 def searchUser(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         flash("You are not authenticated. Please login again!")
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
@@ -388,6 +526,14 @@ def searchUser(user_address):
 @app.route("/search/doc", methods=["GET"])
 @token_required
 def searchDoc(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         flash("You are not authenticated. Please login again!")
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
@@ -404,6 +550,14 @@ def searchDoc(user_address):
 @app.route("/post/api/send/request/mail", methods=["POST"])
 @token_required
 def sendRequestMailToResident(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         return jsonify({"success": False, "status_code": 401})
     try:
@@ -416,7 +570,9 @@ def sendRequestMailToResident(user_address):
         owner_email = request.form.get("owner_email")
         owner_name = request.form.get("owner_name")
 
-        approval_url = f"{SERVER_BASE_ADDRESS}/resident/approve/doc/?requester={requester_address}&owner={owner_address}&doc_id={doc_id}"
+        approval_url = f"""
+            {SERVER_BASE_ADDRESS}/resident/approve/doc/?requester={requester_address}&owner={owner_address}&doc_id={doc_id}
+        """
         msg = Message(
             recipients=[
                 owner_email,
@@ -435,6 +591,14 @@ def sendRequestMailToResident(user_address):
 @app.route("/post/api/send/approve/mail", methods=["POST"])
 @token_required
 def sendapprovedMailToRequestor(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         return jsonify({"success": False, "status_code": 401})
     try:
@@ -487,6 +651,14 @@ def sendapprovedMailToRequestor(user_address):
 @app.route("/resident/approve/doc/", methods=["GET"])
 @token_required
 def approoveDoc(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         flash("You are not authenticated. Please login again!")
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
@@ -516,6 +688,14 @@ def approoveDoc(user_address):
 @app.route("/requestor/doc/access", methods=["GET"])
 @token_required
 def access_doc(user_address):
+    """_summary_
+
+    Args:
+        user_address (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not user_address:
         flash("You are not authenticated. Please login again!")
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
