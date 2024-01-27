@@ -14,9 +14,9 @@ coverage:
         threshold: 0%
         base: auto
         branches:
-        - main
-        - digilocker_heroku
-        - dev-2
+          - main
+          - digilocker_heroku
+          - dev-2
         if_ci_failed: ignore
         only_pulls: true
 
