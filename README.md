@@ -1,5 +1,8 @@
-
 # Digital Locker using Ethereum Blockchain
+
+[![Docker Image CI](https://github.com/Behordeun/digiLocker_mod/actions/workflows/docker-image.yml/badge.svg)](https://github.com/Behordeun/digiLocker_mod/actions/workflows/docker-image.yml)
+
+[![wakatime](https://wakatime.com/badge/user/e47dea41-8692-44e5-bd23-27b3544ed664/project/018b9bf5-3291-411c-9653-865e61cc89cb.svg)](https://wakatime.com/badge/user/e47dea41-8692-44e5-bd23-27b3544ed664/project/018b9bf5-3291-411c-9653-865e61cc89cb)
 
 ## Disclaimer
 
