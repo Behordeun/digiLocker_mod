@@ -1,5 +1,5 @@
 # Import the needed modules
-from app import app
+from app2 import app
 # from app import get_dropbox_credentials, setup_dropbox_client
 
 
