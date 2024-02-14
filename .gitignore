@@ -166,3 +166,5 @@ environment.yml
 tmp.Dockerfile
 .cache_ggshield
 app2.py
+digilocker.yaml
+service.yaml
