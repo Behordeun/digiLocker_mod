@@ -7,3 +7,5 @@ venv/
 .history/
 tmp.Dockerfile
 .cache_ggshield
+Dockerfile
+app2.py

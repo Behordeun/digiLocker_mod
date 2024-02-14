@@ -1,13 +1,5 @@
 # Import the needed modules
-from app2 import app
-# from app import get_dropbox_credentials, setup_dropbox_client
-
-
-#def main():
-#    """_summary_"""
-#    access_token = get_dropbox_credentials()
-#    setup_dropbox_client(access_token)
-
+from app import app
 
 if __name__ == "__main__":
     app.run(

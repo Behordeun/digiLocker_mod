@@ -3,13 +3,9 @@ import datetime
 import hashlib
 import random
 import string
-import threading
-import time
 from functools import wraps
 
 import dropbox
-from dropbox.exceptions import AuthError
-from dropbox import DropboxOAuth2FlowNoRedirect
 import jwt
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.PublicKey import RSA
@@ -36,60 +32,32 @@ app.config.from_object(settings)
 
 
 ALLOWED_EXTENSIONS = {
-    +    "txt",
-    +    "pdf",
-    +    "png",
-    +    "jpg",
-    +    "jpeg",
-    +    "gif",
-    +    "docx",
-    +    ".py",
-    +    ".csv",
-    +    ".xlsx",
-    +
+    "txt",
+    "pdf",
+    "png",
+    "jpg",
+    "jpeg",
+    "gif",
+    "docx",
+    ".py",
+    ".csv",
+    ".xlsx",
 }
 
 
 mail = Mail(app)
-dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
 SERVER_BASE_ADDRESS = app.config["SERVER_BASE_ADDRESS"]
 
-# Placeholder function to get your app's current access and refresh tokens
-def get_current_tokens():
-    return {
-        "access_token": app.config['DROPBOX_ACCESS_TOKEN'],
-    "refresh_token": app.config['DROPBOX_REFRESH_TOKEN']
-    }
-    
+
+def get_dropbox_client():
+    return dropbox.Dropbox(
+        oauth2_refresh_token=app.config["DROPBOX_REFRESH_TOKEN"],
+        app_key=app.config["DROPBOX_KEY"],
+        app_secret=app.config["DROPBOX_SECRET"],
+    )
 
 
-def refresh_dropbox_token():
-    while True:
-        try:
-            flow = dropbox.DropboxOAuth2FlowNoRedirect(
-                app.config["DROPBOX_APP_KEY"], app.config["DROPBOX_APP_SECRET"]
-            )
-
-            # Obtain a new access token
-            new_token = flow.refresh_access_token(app.config["DROPBOX_REFRESH_TOKEN"])
-
-            # Update the Dropbox instance with the new access token
-            dropbox_.auth = new_token
-
-            print("Dropbox token refreshed successfully.")
-
-            # Sleep for a certain interval before refreshing again
-            time.sleep(app.config["DROPBOX_TOKEN_REFRESH_INTERVAL"])
-        except AuthError as e:
-            print(f"Error refreshing Dropbox token: {e}")
-            # Handle the error as needed
-            time.sleep(app.config["DROPBOX_TOKEN_REFRESH_INTERVAL"])
-
-
-# Start a thread for the token refresh process
-token_refresh_thread = threading.Thread(target=refresh_dropbox_token)
-token_refresh_thread.daemon = True
-token_refresh_thread.start()
+dropbox_ = get_dropbox_client()
 
 
 def token_required(f):
@@ -107,9 +75,8 @@ def token_required(f):
         if "x-access-tokens" in session.keys():
             token = session.get("x-access-tokens")
             try:
-                data = jwt.decode(token, app.config["SECRET_KEY"])
+                data_ = jwt.decode(token, app.config["SECRET_KEY"])
                 user_address = session.get("user_address")
-                data_ = data
                 return f(user_address, *args, **kwargs)
             except AttributeError as e:
                 print("AttributeError occurred", e)
@@ -236,7 +203,7 @@ def upload_file_postapi(user_address):
             )
         else:
             try:
-                savepath = docId + "." + file.filename.split(".")[-1]
+                savepath = f"{docId}." + file.filename.split(".")[-1]
                 savepath = f"/test_dropbox/{user_address}/{savepath}"
                 res = dropbox_.files_upload(fileContent, savepath)
             except AttributeError as e:
@@ -247,8 +214,8 @@ def upload_file_postapi(user_address):
                 {
                     "success": True,
                     "redirect_url": "/dashboard",
-                    "docHash": "0x" + docHash,
-                    "docId": "0x" + docId,
+                    "docHash": f"0x{docHash}",
+                    "docId": f"0x{docId}",
                     "status_code": 200,
                 }
             )
@@ -279,7 +246,7 @@ def comparehash_digest_nd_senddockey(user_address):
         mkey_digest_new.update(app.config["SECRET_KEY"].encode("utf-8"))
         mkey_digest_new = mkey_digest_new.hexdigest()
 
-        if "0x" + mkey_digest_new == mkeydigest:
+        if f"0x{mkey_digest_new}" == mkeydigest:
             result = {"valid": True, "success": True, "status_code": 200}
         else:
             result = {"valid": False, "success": True, "status_code": 200}
@@ -288,8 +255,6 @@ def comparehash_digest_nd_senddockey(user_address):
             total_doc = request.form["total_doc"]
             ekey = getKey(int(total_doc), master_key, user_address)
             result["ekey"] = ekey
-            return jsonify(result)
-        else:
             return jsonify(result)
 
     except AttributeError as e:
@@ -323,7 +288,7 @@ def registration_postapi(user_address):
             last_name = request.form.get("last_name")
             # TODO: ADD MORE PARAMS IN HASH
             mkey_digest = hashlib.sha256()
-            mkey_digest.update(master_key.strip().encode())
+            mkey_digest.update(master_key.strip().encode("utf-8"))
             mkey_digest.update(app.config["SECRET_KEY"].encode("utf-8"))
             mkey_digest = mkey_digest.hexdigest()
 
@@ -409,11 +374,11 @@ def login_api():
         _type_: _description_
     """
     urandomToken = "".join(
-        random.SystemRandom().choice(string.ascii_letters + string.digits) for i in range(32)
+        random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(32)
     )
     token = jwt.encode(
         {
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=120),
+            "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=120),
             "token": urandomToken,
         },
         app.config["SECRET_KEY"],
@@ -770,7 +735,7 @@ def downloadEncryptedFileNcompareHash(user_address):
         fileData = None
         try:
             # remove 0x from docid
-            savepath = doc_id[2:] + "." + doc_name.split(".")[-1]
+            savepath = f"{doc_id[2:]}." + doc_name.split(".")[-1]
             savepath = f"/test_dropbox/{owner_add}/{savepath}"
             metadata, fileData = dropbox_.files_download(savepath)
         except AttributeError as e:
@@ -778,7 +743,7 @@ def downloadEncryptedFileNcompareHash(user_address):
             return {"success": False, "error": str(e)}
 
         # 2. Compare hash
-        docHashObtained = "0x" + hashlib.sha256(fileData.content).hexdigest()
+        docHashObtained = f"0x{hashlib.sha256(fileData.content).hexdigest()}"
         if docHashObtained != dochash:
             return {"success": False, "error": "Corrupted file, dochash not matched"}
 
@@ -786,7 +751,7 @@ def downloadEncryptedFileNcompareHash(user_address):
             keyPriv = RSA.importKey(privKey)  # import the private key
             cipher = Cipher_PKCS1_v1_5.new(keyPriv)
         except AttributeError as e:
-            print("Key error", str(e))
+            print("Key error", e)
             return {
                 "success": False,
                 "error": "Private key is not valid. Please re enter the private key.",
@@ -797,7 +762,7 @@ def downloadEncryptedFileNcompareHash(user_address):
             ekey = binascii.unhexlify(ekey)
             decrypt_text = cipher.decrypt(ekey, None).decode()
         except AttributeError as e:
-            print("Key error", str(e))
+            print("Key error", e)
             return {"success": False, "error": "Private key is not valid"}
 
         return {
