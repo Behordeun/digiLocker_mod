@@ -3,14 +3,21 @@ import datetime
 import hashlib
 import random
 import string
+from base64 import b64decode, b64encode
+from datetime import timedelta
 from functools import wraps
 
+# from werkzeug import secure_filename
 import dropbox
 import jwt
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from Crypto.PublicKey import RSA
-from dotenv import load_dotenv
-from dropbox.exceptions import AuthError
+from dapr.actor import ActorInterface, actormethod
+from dapr.actor.runtime.config import (  # , ActorTypeConfig
+    ActorReentrancyConfig,
+    ActorRuntimeConfig,
+)
+from dapr.conf import settings
 from flask import (
     Flask,
     flash,
@@ -21,25 +28,50 @@ from flask import (
     session,
     url_for,
 )
+from flask_dapr.actor import DaprActor
 from flask_mail import Mail, Message
+from werkzeug.utils import secure_filename
 
 import settings
+from dapr_config.demo_actor import DemoActor
 from utils import *
 
-load_dotenv()
+# app = Flask(__name__)
 
-app = Flask(__name__)
+app = Flask(f"{DemoActor.__name__}Service")
+
+# Enable DaprActor Extension
+actor = DaprActor(app)
+
+# Register DemoActor
+actor.register_actor(DemoActor)
+
+# Create ActorRuntime configuration
+# actor_runtime_config = ActorRuntimeConfig(
+#    actor_idle_timeout=timedelta(hours=1),
+#    actor_scan_interval=timedelta(seconds=30),
+#    drain_ongoing_call_timeout=timedelta(minutes=1),
+#    drain_rebalanced_actors=True,
+#    reentrancy=ActorReentrancyConfig(enabled=False),
+#    reminders_storage_partitions=7
+# )
+
+ALLOWED_EXTENSIONS = {"txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".py"}
 app.config.from_object(settings)
-
-
-ALLOWED_EXTENSIONS = set(
-    ["txt", "pdf", "png", "jpg", "jpeg", "gif", "docx", ".py", ".csv", ".xlsx"]
-)
-
-
 mail = Mail(app)
-dropbox_ = dropbox.Dropbox(app.config["DROPBOX_ACCESS_TOKEN"])
+
 SERVER_BASE_ADDRESS = app.config["SERVER_BASE_ADDRESS"]
+
+
+def get_dropbox_client():
+    return dropbox.Dropbox(
+        oauth2_refresh_token=app.config["DROPBOX_REFRESH_TOKEN"],
+        app_key=app.config["DROPBOX_KEY"],
+        app_secret=app.config["DROPBOX_SECRET"],
+    )
+
+
+dropbox_ = get_dropbox_client()
 
 
 def token_required(f):
@@ -50,10 +82,9 @@ def token_required(f):
             try:
                 data = jwt.decode(token, app.config["SECRET_KEY"])
                 user_address = session.get("user_address")
-                data_ = data
                 return f(user_address, *args, **kwargs)
-            except AttributeError as e:
-                print("AttributeError occurred", e)
+            except Exception as e:
+                print("Exception occured", e)
                 return f(None, *args, **kwargs)
 
         return f(None, *args, **kwargs)
@@ -112,16 +143,13 @@ def upload_file_postapi(user_address):
             fileContent = file.read().strip()
 
             if len(fileContent) // (10**6) > 7:
-                return {
-                    "success": False,
-                    "error": "The upload size should be less than 5MB",
-                }
+                return {"success": False, "error": "The upload size should be less than 5MB"}
             docHash = hashlib.sha256(fileContent).hexdigest()
             docId = hashlib.sha256()
             docId.update(user_address.encode())
             docId.update(docHash.encode())
             docId = docId.hexdigest()
-        except AttributeError as e:
+        except Exception as e:
             print(e, "dochash")
             return {"success": False, "error": str(e)}
 
@@ -137,10 +165,10 @@ def upload_file_postapi(user_address):
             )
         else:
             try:
-                savepath = docId + "." + file.filename.split(".")[-1]
+                savepath = f"{docId}." + file.filename.split(".")[-1]
                 savepath = f"/test_dropbox/{user_address}/{savepath}"
                 res = dropbox_.files_upload(fileContent, savepath)
-            except AttributeError as e:
+            except Exception as e:
                 print(e, "error")
                 return {"success": False, "error": str(e)}
 
@@ -148,12 +176,12 @@ def upload_file_postapi(user_address):
                 {
                     "success": True,
                     "redirect_url": "/dashboard",
-                    "docHash": "0x" + docHash,
-                    "docId": "0x" + docId,
+                    "docHash": f"0x{docHash}",
+                    "docId": f"0x{docId}",
                     "status_code": 200,
                 }
             )
-    except AttributeError as e:
+    except Exception as e:
         return jsonify({"success": False, "status_code": 400, "error": str(e)})
 
 
@@ -168,11 +196,12 @@ def comparehash_digest_nd_senddockey(user_address):
         is_upload = int(request.form["upload"])
 
         mkey_digest_new = hashlib.sha256()
-        mkey_digest_new.update(master_key.strip().encode())
+        mkey_digest_new.update(master_key.strip().encode("utf-8"))
         mkey_digest_new.update(app.config["SECRET_KEY"].encode("utf-8"))
+        # mkey_digest_new.update(user_address.encode())
         mkey_digest_new = mkey_digest_new.hexdigest()
 
-        if "0x" + mkey_digest_new == mkeydigest:
+        if f"0x{mkey_digest_new}" == mkeydigest:
             result = {"valid": True, "success": True, "status_code": 200}
         else:
             result = {"valid": False, "success": True, "status_code": 200}
@@ -182,11 +211,9 @@ def comparehash_digest_nd_senddockey(user_address):
             ekey = getKey(int(total_doc), master_key, user_address)
             result["ekey"] = ekey
             return jsonify(result)
-        else:
-            return jsonify(result)
 
-    except AttributeError as e:
-        print(e, "AttributeError in comparehash")
+    except Exception as e:
+        print(e, "Exception in comparehash")
         return jsonify({"success": False, "status_code": 400})
 
 
@@ -209,22 +236,19 @@ def registration_postapi(user_address):
             # TODO: ADD MORE PARAMS IN HASH
             mkey_digest = hashlib.sha256()
             mkey_digest.update(master_key.strip().encode())
-            mkey_digest.update(app.config["SECRET_KEY"].encode("utf-8"))
+            mkey_digest.update(app.config["SECRET_KEY"])
             mkey_digest = mkey_digest.hexdigest()
 
             msg = Message(
                 recipients=[
                     email,
                 ],
-                subject="Account Successfully Created",
                 sender=MAIL_SENDER,
             )
             msg.body = f"""
                     Hello, {first_name} {last_name},
 
                     Welcome to digiLocker. You are now authorized to use digiLocker to store your documents.
-
-                    Your master key is '{master_key}', please keep this email safe as we do not record this information, and are unable to recover it for you.
 
                     Now, you are in full control of how your documents are shared with users.
 
@@ -250,33 +274,25 @@ def registration_postapi(user_address):
                 recipients=[
                     email,
                 ],
-                subject=f"Hello {org_name}",
                 sender=MAIL_SENDER,
             )
             msg.body = f"""
-            welcome to digiLocker. Now, your organization can access and verify documents shared by residents. We hope that you'll keep their data protected in line with the appropriate global DPRs.
+            Hello {org_name}, welcome to digiLocker.
+
+            Now, your organization can access and verify documents shared by residents. We hope that you'll keep their data protected in line with the appropriate global DPRs.
 
             Below are your credentials:
-            public_key: * '{pu}'
-
-            private_key: * '{pr}'
-
-            Please keep this email safe as we are unable to retrieve these credentials for you.
-
+            * {pu}
+            * {pr}
             Regards,
             Muhammad A.
             For the digiLocker Team
             """
             mail.send(msg)
             return jsonify(
-                {
-                    "success": True,
-                    "redirect_url": "/dashboard",
-                    "pu": pu,
-                    "status_code": 200,
-                }
+                {"success": True, "redirect_url": "/dashboard", "pu": pu, "status_code": 200}
             )
-    except AttributeError as e:
+    except Exception as e:
         print("register", e)
         return {
             "success": False,
@@ -289,7 +305,7 @@ def registration_postapi(user_address):
 @app.route("/api/login/metamask", methods=["GET"])
 def login_api():
     urandomToken = "".join(
-        random.SystemRandom().choice(string.ascii_letters + string.digits) for i in range(32)
+        random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(32)
     )
     token = jwt.encode(
         {
@@ -322,11 +338,7 @@ def login_postapi():
         session["user_address"] = address
         recovered_addr = recover_to_addr(token, signature)
         if address != recovered_addr:
-            return {
-                "success": False,
-                "redirect_url": "/",
-                "error": "Address verification failed",
-            }
+            return {"success": False, "redirect_url": "/", "error": "Address verification failed"}
         else:
             if is_registered == "false":
                 return {"success": True, "redirect_url": "/registration"}
@@ -342,7 +354,7 @@ def verifyMasterCode(user_address):
             return {"success": True, "valid": True, "status_code": 200}
         else:
             return {"success": True, "valid": False, "status_code": 200}
-    except AttributeError as e:
+    except Exception as e:
         print(e, "xxx")
         return {"success": False, "error": str(e), "status_code": 400}
 
@@ -416,25 +428,24 @@ def sendRequestMailToResident(user_address):
         owner_email = request.form.get("owner_email")
         owner_name = request.form.get("owner_name")
 
-        approval_url = f"{SERVER_BASE_ADDRESS}/resident/approve/doc/?requester={requester_address}&owner={owner_address}&doc_id={doc_id}"
+        approval_url = f"{SERVER_BASE_ADDRESS}/resident/aproove/doc/?requester={requester_address}&owner={owner_address}&doc_id={doc_id}"
         msg = Message(
             recipients=[
                 owner_email,
             ],
-            subject="Document Request\033[0m",
             sender=MAIL_SENDER,
         )
         msg.body = f"""
             Hello {owner_name}, {requester_email} is requesting access to {doc_name} please review the request and accept/decline the request via {approval_url}"""
         mail.send(msg)
         return jsonify({"success": True, "redirect_url": "/dashboard", "status_code": 200})
-    except AttributeError as e:
+    except Exception as e:
         return jsonify({"success": False, "error": str(e), "status_code": 400})
 
 
-@app.route("/post/api/send/approve/mail", methods=["POST"])
+@app.route("/post/api/send/aproove/mail", methods=["POST"])
 @token_required
-def sendapprovedMailToRequestor(user_address):
+def sendAproovedMailToRequestor(user_address):
     if not user_address:
         return jsonify({"success": False, "status_code": 401})
     try:
@@ -467,7 +478,6 @@ def sendapprovedMailToRequestor(user_address):
             recipients=[
                 requester_email,
             ],
-            subject="Request Approved\033[0m",
             sender=MAIL_SENDER,
         )
         msg.body = f"""
@@ -479,12 +489,12 @@ def sendapprovedMailToRequestor(user_address):
         """
         mail.send(msg)
         return jsonify({"success": True, "status_code": 200})
-    except AttributeError as e:
+    except Exception as e:
         print(e, "in mail send")
         return jsonify({"success": False, "error": str(e), "status_code": 400})
 
 
-@app.route("/resident/approve/doc/", methods=["GET"])
+@app.route("/resident/aproove/doc/", methods=["GET"])
 @token_required
 def approoveDoc(user_address):
     if not user_address:
@@ -501,7 +511,9 @@ def approoveDoc(user_address):
     if owner_address != user_address:
         session.pop("x-access-tokens", None)
         session.pop("user_address", None)
-        flash("Not a correct account address, you are logged in with. Try with different account.")
+        flash(
+            "Not a correct account address, you are logging in with. Try with different account."
+        )
         return redirect(url_for("index", next="/".join(request.url.split("/")[3:])))
 
     return render_template(
@@ -550,13 +562,6 @@ def access_doc(user_address):
 @app.route("/api/post/file/comparehash", methods=["POST"])
 @token_required
 def downloadEncryptedFileNcompareHash(user_address):
-    """
-    1. Download encrypted file
-    2. Compare Hash
-    3. Decrypt doc key
-    4. Send file back, and key
-    """
-
     if not user_address:
         return jsonify({"success": False, "status_code": 401})
     try:
@@ -567,38 +572,43 @@ def downloadEncryptedFileNcompareHash(user_address):
         privKey = request.form.get("privKey")
         doc_name = request.form.get("doc_name")
 
+        """
+        1. Download encrypted file
+        2. Compare Hash
+        3. Decrypt doc key
+        4. Send file back, and key
+        """
         # 1. Download encrypted file
         fileData = None
         try:
             # remove 0x from docid
-            savepath = doc_id[2:] + "." + doc_name.split(".")[-1]
+            savepath = f"{doc_id[2:]}." + doc_name.split(".")[-1]
             savepath = f"/test_dropbox/{owner_add}/{savepath}"
             metadata, fileData = dropbox_.files_download(savepath)
-        except AttributeError as e:
+        except Exception as e:
             print(e, "error")
             return {"success": False, "error": str(e)}
 
-        # 2. Compare hash
-        docHashObtained = "0x" + hashlib.sha256(fileData.content).hexdigest()
+        # compare hash
+        docHashObtained = f"0x{hashlib.sha256(fileData.content).hexdigest()}"
         if docHashObtained != dochash:
             return {"success": False, "error": "Corrupted file, dochash not matched"}
 
         try:
             keyPriv = RSA.importKey(privKey)  # import the private key
             cipher = Cipher_PKCS1_v1_5.new(keyPriv)
-        except AttributeError as e:
-            print("Key error", str(e))
+        except Exception as e:
+            print("Key error", e)
             return {
                 "success": False,
                 "error": "Private key is not valid. Please re enter the private key.",
             }
 
-        # 3. Decrypt doc key
         try:
             ekey = binascii.unhexlify(ekey)
             decrypt_text = cipher.decrypt(ekey, None).decode()
-        except AttributeError as e:
-            print("Key error", str(e))
+        except Exception as e:
+            print("Key error", e)
             return {"success": False, "error": "Private key is not valid"}
 
         return {
@@ -608,5 +618,10 @@ def downloadEncryptedFileNcompareHash(user_address):
             "owner_address": owner_add,
             "doc_name": doc_name,
         }
-    except AttributeError as e:
+    except Exception as e:
         return {"success": False, "error": str(e)}
+
+
+# if __name__ == '__main__':
+#    app.run(host=app.config["APPLICATION_HOST"], debug=True, port=app.config["APPLICATION_PORT"])
+#    # app.run(host="172.18.16.108", debug=True)
