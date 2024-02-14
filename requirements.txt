@@ -11,7 +11,7 @@ dapr==1.2.0
 dapr-client==0.4.0b1
 dapr.ext.grpc==1.2.0
 datetime
-dropbox==9.5.0
+dropbox
 eth-abi==2.1.1
 eth-account==0.4.0
 eth-hash==0.2.0
@@ -54,7 +54,7 @@ requests-oauthlib==1.3.0
 rlp==1.2.0
 six==1.14.0
 toolz==0.10.0
-typing-extensions==3.7.4.1
+typing-extensions
 urllib3==1.25.8
 URLObject==2.4.3
 uvicorn

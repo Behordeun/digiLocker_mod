@@ -115,7 +115,7 @@ def prepareRequestMail(
             line-height: 36px;
             text-transform: uppercase;"
         >
-        Click to aproove the request
+        Click to approve the request
         </a>
         <br />
         <br />
@@ -132,7 +132,7 @@ def prepareRequestMail(
     return msg
 
 
-def prepareApro0vedMail(
+def prepareAproovedMail(
         owner_name,
         owner_email,
         requester_email,
